@@ -8,3 +8,8 @@ interface AddDeckAction {
 }
 
 export type DeckActionTypes = AddDeckAction;
+
+export const addDeck = (deck: Deck) => ({
+  type: ADD_DECK,
+  deck,
+});
