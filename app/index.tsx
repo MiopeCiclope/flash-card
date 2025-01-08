@@ -1,32 +1,23 @@
-import React, { useEffect } from 'react';
-import { Text, View } from '@/components/Themed';
-import { Link } from 'expo-router';
+import React from 'react';
+import { View } from '@/components/Themed';
 import Deck from '@/components/Deck';
 import { useDispatch, useSelector } from 'react-redux';
-import { addDeck } from '@/store/action';
+import { addDeck } from '@/store/deckAction';
 import { Deck as FlashDeck } from '@/models/decks';
 import { Button } from 'react-native';
 
 export default function ListScreen() {
   const dispatch = useDispatch();
-  const myData = useSelector((state: any) => state?.deckReducer);
-  console.log(myData)
+  const deckList = useSelector((state: any) => state?.deckReducer.decks);
 
   const add = () => {
     const newDeck: FlashDeck = { id: "2", name: "test", iconName: "test" }; // replace with actual data
-    dispatch(addDeck(newDeck))
+    dispatch(addDeck(deckList, newDeck))
   }
 
   return (
     <View>
-      <Text style={{ fontSize: 20, textAlign: 'center' }}>List</Text>
-      <Link href="/(tabs)/one">
-        navigate to tabs
-      </Link>
-
-      <Deck iconName='home' title='Home' />
-      <Deck iconName='search' title='Search' />
-      <Deck iconName='settings' title='Settings' />
+      {deckList?.map((deck: FlashDeck, index: number) => <Deck key={index} id={deck.id} iconName='home' name={deck.name} />)}
       <Button title="Add Item" onPress={add} />
     </View>
   );

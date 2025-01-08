@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createStore } from 'redux';
 import { combineReducers } from 'redux';
 import { persistStore, persistReducer } from 'redux-persist';
-import deckReducer from "./reducer";
+import deckReducer from "./deckReducer";
 
 const rootReducer = combineReducers({
   deckReducer

@@ -1,18 +1,47 @@
-import { StatusBar } from 'expo-status-bar';
-import { Platform, StyleSheet } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
+import { Button, StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
+import SearchableDropdown from 'react-native-searchable-dropdown';
+import Ionicons from '@expo/vector-icons/build/Ionicons';
+import { useState } from 'react';
+
+const iconNames = Object.keys(Ionicons.glyphMap);
 
 export default function ModalScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Modal</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/modal.tsx" />
+  const [selectedIcon, setSelectedIcon] = useState(null); // Selected icon state
 
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
+  const handleSubmit = () => {
+    console.log('Submitted icon:', selectedIcon);
+    // Add code here to handle the submission of the selected icon
+  };
+
+  return (
+    <View>
+      <SearchableDropdown
+        onItemSelect={(item) => setSelectedIcon(item.id)}
+        containerStyle={{ padding: 5 }}
+        textInputProps={
+          {
+            placeholder: "Search for an icon...",
+            underlineColorAndroid: "transparent",
+            style: {
+              padding: 12,
+              borderWidth: 1,
+              borderColor: '#ccc',
+              borderRadius: 5,
+            },
+          }
+        }
+        itemStyle={{
+          padding: 10,
+          marginTop: 2,
+          backgroundColor: '#ddd',
+          borderColor: '#bbb',
+          borderWidth: 1,
+          borderRadius: 5,
+        }}
+        items={iconNames.map((name) => ({ name, id: name }))} // Map icon names to dropdown items
+      />
+      <Button title="Submit" onPress={handleSubmit} /> // Submit button to handle the selected icon
     </View>
   );
 }

@@ -1,7 +1,7 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Link, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
@@ -10,6 +10,8 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '../store/store';
 
 import { useColorScheme } from '@/components/useColorScheme';
+import { TouchableOpacity, Text } from 'react-native';
+import Ionicons from '@expo/vector-icons/build/Ionicons';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -56,7 +58,13 @@ function RootLayoutNav() {
       <PersistGate loading={null} persistor={persistor}>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <Stack>
-            <Stack.Screen name="index" options={{ headerTitle: 'List' }} />
+            <Stack.Screen name="index" options={{
+              headerTitle: 'List', headerRight: () => (
+                <Link href="/modal" style={{ marginRight: 10, fontSize: 18 }}>
+                  <Ionicons name="add" size={20} />
+                </Link>
+              ),
+            }} />
             <Stack.Screen name="(tabs)" options={{ headerShown: true }} />
             <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
           </Stack>
