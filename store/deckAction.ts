@@ -1,13 +1,19 @@
 import { Deck } from "@/models/decks";
 
 export const ADD_DECK = 'ADD_DECK';
+export const SELECT_DECK = 'SELECT_DECK';
 
 interface AddDeckAction {
   type: typeof ADD_DECK;
   decks: Deck[];
 }
 
-export type DeckActionTypes = AddDeckAction
+interface SelectDeckAction {
+  type: typeof SELECT_DECK;
+  selectedDeck?: Deck;
+}
+
+export type DeckActionTypes = AddDeckAction | SelectDeckAction
 
 const replaceDeck = (deckList: Deck[], newDeck: Deck) => deckList.map(deck =>
   deck.id === newDeck.id ? newDeck : deck
@@ -38,3 +44,9 @@ export const addCard = (deckList: Deck[], newDeck: Deck) => {
     decks: updatedDecks,
   };
 }
+
+export const selectDeck = (deck?: Deck) => (
+  {
+    type: SELECT_DECK,
+    selectedDeck: deck,
+  })

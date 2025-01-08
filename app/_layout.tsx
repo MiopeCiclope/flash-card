@@ -10,8 +10,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '../store/store';
 
 import { useColorScheme } from '@/components/useColorScheme';
-import { TouchableOpacity, Text } from 'react-native';
-import Ionicons from '@expo/vector-icons/build/Ionicons';
+import AddDeck from '@/components/AddDeck';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -59,14 +58,11 @@ function RootLayoutNav() {
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <Stack>
             <Stack.Screen name="index" options={{
-              headerTitle: 'List', headerRight: () => (
-                <Link href="/modal" style={{ marginRight: 10, fontSize: 18 }}>
-                  <Ionicons name="add" size={20} />
-                </Link>
-              ),
+              headerTitle: 'List',
+              headerRight: () => (<AddDeck />),
             }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: true }} />
-            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+            <Stack.Screen name="(tabs)" options={{ headerTitle: "Deck", headerShown: true }} />
+            <Stack.Screen name="deck-detail" options={{ headerShown: true, headerTitle: "New Deck" }} />
           </Stack>
         </ThemeProvider>
       </PersistGate>

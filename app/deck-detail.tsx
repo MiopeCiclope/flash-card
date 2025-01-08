@@ -1,8 +1,8 @@
 import { Button, TextInput } from 'react-native';
 import { View } from '@/components/Themed';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
-export default function ModalScreen() {
+export default function DeckDetail() {
   const [iconName, setIconName] = useState("");
   const [name, setName] = useState("");
 
