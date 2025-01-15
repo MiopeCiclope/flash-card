@@ -28,7 +28,7 @@ export default function DeckDetail() {
   const dispatch = useDispatch();
 
   const handleSubmit = () => {
-    dispatch(addDeck(deckList, { id: generateRandomId(), name: name, iconName: iconName } as Deck))
+    dispatch(addDeck(deckList, { id: generateRandomId(), name: name, iconName: iconName, cards: cardList } as Deck))
     router.back()
   };
 
