@@ -6,21 +6,30 @@ export default function TabOneScreen() {
   const deck = useSelector((state: any) => state?.deckReducer.selectedDeck);
 
   return (
-    <View style={styles.container}>
+    <View style={styles.card}>
       {deck && <Text style={styles.title}>{deck.name}</Text>}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+  card: {
+    borderWidth: 1,
+    borderRadius: 2,
+    borderColor: '#ddd',
+    borderBottomWidth: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+    marginLeft: 5,
+    marginRight: 5,
+    marginTop: 10,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18,
+    padding: 16,
   },
   separator: {
     marginVertical: 30,
