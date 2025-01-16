@@ -1,14 +1,17 @@
 import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
 import { Text, View } from '@/components/Themed';
+import { useSelector } from 'react-redux';
 
 export default function TabTwoScreen() {
+  const deck = useSelector((state: any) => state?.deckReducer.selectedDeck);
+  console.log(deck);
+  const { translation, sound, detail } = deck.cards[0].back
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/two.tsx" />
+      <Text>{translation}</Text>
+      <Text>{sound}</Text>
+      <Text>{detail}</Text>
     </View>
   );
 }

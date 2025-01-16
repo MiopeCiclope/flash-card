@@ -13,22 +13,21 @@ function generateRandomId(): string {
 
 
 export default function DeckDetail() {
-  const [iconName, setIconName] = useState("");
-  const [name, setName] = useState("");
+  const selectedDeck = useSelector((state: any) => state?.deckReducer.selectedDeck);
+  const deckList = useSelector((state: any) => state?.deckReducer.decks);
+  const dispatch = useDispatch();
+
+  const [iconName, setIconName] = useState(selectedDeck?.iconName || "");
+  const [name, setName] = useState(selectedDeck?.name || "");
+  const [cardList, setCardList] = useState<Card[]>(selectedDeck?.cards || []);
 
   const [word, setWord] = useState('');
   const [translation, setTranslation] = useState('');
   const [sound, setSound] = useState("")
   const [details, setDetails] = useState("")
 
-  const [cardList, setCardList] = useState<Card[]>([]);
-
-
-  const deckList = useSelector((state: any) => state?.deckReducer.decks);
-  const dispatch = useDispatch();
-
   const handleSubmit = () => {
-    dispatch(addDeck(deckList, { id: generateRandomId(), name: name, iconName: iconName, cards: cardList } as Deck))
+    dispatch(addDeck(deckList, { id: !selectedDeck ? generateRandomId() : selectedDeck.id, name: name, iconName: iconName, cards: cardList } as Deck))
     router.back()
   };
 

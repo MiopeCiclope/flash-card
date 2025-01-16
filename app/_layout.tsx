@@ -11,6 +11,7 @@ import { store, persistor } from '../store/store';
 
 import { useColorScheme } from '@/components/useColorScheme';
 import AddDeck from '@/components/AddDeck';
+import EditDeck from '@/components/EditDeck';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -61,7 +62,10 @@ function RootLayoutNav() {
               headerTitle: 'List',
               headerRight: () => (<AddDeck />),
             }} />
-            <Stack.Screen name="(tabs)" options={{ headerTitle: "Deck", headerShown: true }} />
+            <Stack.Screen name="(tabs)" options={{
+              headerTitle: "Deck", headerShown: true,
+              headerRight: () => (<EditDeck />),
+            }} />
             <Stack.Screen name="deck-detail" options={{ headerShown: true, headerTitle: "New Deck" }} />
           </Stack>
         </ThemeProvider>
