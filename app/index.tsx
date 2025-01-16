@@ -9,7 +9,7 @@ export default function ListScreen() {
 
   return (
     <View>
-      {deckList?.map((deck: FlashDeck, index: number) => <Deck key={index} id={deck.id} iconName='home' name={deck.name} />)}
+      {deckList?.map((deck: FlashDeck, index: number) => <Deck key={index} deck={deck} />)}
     </View>
   );
 }

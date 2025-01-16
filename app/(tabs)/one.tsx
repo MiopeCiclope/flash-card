@@ -4,16 +4,15 @@ import { useSelector } from 'react-redux';
 
 export default function TabOneScreen() {
   const deck = useSelector((state: any) => state?.deckReducer.selectedDeck);
-//{cards && cards.length > 0 &&
-//          (<Text style={styles.title}>{cards[0].front.word}</Text>)
-//        }
-//        {!(cards && cards.length > 0) &&
-//          (<Text style={styles.title}>No Flash Cards in this deck</Text>)
-//        }
-//
+
   return (
     <View style={styles.card}>
-      {deck && <Text style={styles.title}>{deck.name}</Text>}
+      {deck && deck.cards && deck.cards.length > 0 &&
+        (<Text style={styles.title}>{deck.cards[0].front.word}</Text>)
+      }
+      {!(deck && deck.cards && deck.cards.length > 0) &&
+        (<Text style={styles.title}>No Flash Cards in this deck</Text>)
+      }
     </View>
   );
 }
