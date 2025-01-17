@@ -2,10 +2,11 @@ import { StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useSelector } from 'react-redux';
 import { Link } from 'expo-router';
+import { Card } from '@/models/card';
 
 export default function TabTwoScreen() {
-  const deck = useSelector((state: any) => state?.deckReducer.selectedDeck);
-  const { translation, sound, detail } = deck.cards[0].back
+  const selectedCard = useSelector((state: any) => state?.deckReducer.selectedCard) as Card;
+  const { translation, sound, detail } = selectedCard.back
 
   return (
     <Link href="/(tabs)/one">

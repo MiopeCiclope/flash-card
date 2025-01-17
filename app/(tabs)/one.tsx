@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'expo-router';
 import { PanGestureHandler, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Deck } from '@/models/decks';
 import { Card } from '@/models/card';
+import { selectCard } from '@/store/deckAction';
 
 enum SwipeDirection {
   SwipeRight = 'SwipeRight',
@@ -24,35 +25,31 @@ const getSwipeDirection = (translationX: number, translationY: number): SwipeDir
 
 export default function TabOneScreen() {
   const deck = useSelector((state: any) => state?.deckReducer.selectedDeck) as Deck | null;
+  const selectedCard = useSelector((state: any) => state?.deckReducer.selectedCard) as Card | null;
+  const dispatch = useDispatch()
+
+  const [displayedCards, setDisplayedCards] = useState<Set<number>>(new Set());
   const hasCard = deck && deck.cards && deck.cards.length > 0;
 
-  const getInitialSet = () => {
-    const initialSet = new Set<number>();
-    if (hasCard && deck?.cards?.length) {
+  useEffect(() => {
+    if (hasCard && deck?.cards?.length && !selectedCard) {
       const firstCardIndex = Math.floor(Math.random() * deck.cards.length);
-      initialSet.add(firstCardIndex);
-      return initialSet;
-    }
-    return initialSet;
+      dispatch(selectCard(deck.cards[firstCardIndex]));
 
-  }
-  const [displayedCards, setDisplayedCards] = useState<Set<number>>(getInitialSet());
+      const initialSet = new Set<number>();
+      initialSet.add(firstCardIndex);
+
+      setDisplayedCards(initialSet);
+    }
+  }, [deck, selectedCard, dispatch]);
 
   const getRandomCard = (): Card | null => {
     if (!hasCard) return null;
-    const remainingCards = deck.cards?.filter((_, index) => !displayedCards.has(index)) ?? [];
+    const remainingCards = deck.cards?.filter((_, index) => !displayedCards?.has(index)) ?? [];
     if (remainingCards.length === 0) return null;
     const randomIndex = Math.floor(Math.random() * remainingCards.length);
     return remainingCards[randomIndex];
   };
-
-  const [displayedCard, setDisplayedCard] = useState<Card | null>(() => {
-    if (hasCard && deck?.cards?.length) {
-      const firstCardIndex = [...displayedCards][0];
-      return deck.cards[firstCardIndex];
-    }
-    return getRandomCard();
-  });
 
   const handleGestureEnd = (event: any) => {
     const { translationX, translationY } = event.nativeEvent;
@@ -67,13 +64,13 @@ export default function TabOneScreen() {
             newDisplayedCards.add(deck.cards.indexOf(newCard));
           }
           setDisplayedCards(newDisplayedCards);
-          setDisplayedCard(newCard);
+          dispatch(selectCard(newCard));
         } else {
-          const restartSet = getInitialSet()
+          const restartSet = new Set<number>()
           setDisplayedCards(restartSet);
 
           if (deck?.cards) {
-            setDisplayedCard(deck?.cards[[...restartSet][0]]);
+            dispatch(selectCard(deck?.cards[[...restartSet][0]]));
           }
         }
         break;
@@ -85,10 +82,10 @@ export default function TabOneScreen() {
       <PanGestureHandler onEnded={handleGestureEnd}>
         <View style={styles.container}>
           <View style={styles.card}>
-            {displayedCard ? (
+            {selectedCard ? (
               <>
                 <Link href="/(tabs)/two">
-                  <Text style={styles.title}>{displayedCard.front.word}</Text>
+                  <Text style={styles.title}>{selectedCard.front.word}</Text>
                 </Link>
               </>
             ) : (

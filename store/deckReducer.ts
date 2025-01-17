@@ -1,14 +1,17 @@
 import { Deck } from '@/models/decks';
-import { ADD_DECK, DELETE_DECK, DeckActionTypes, SELECT_DECK } from './deckAction';
+import { ADD_DECK, DELETE_DECK, DeckActionTypes, SELECT_CARD, SELECT_DECK } from './deckAction';
+import { Card } from '@/models/card';
 
 type State = {
-  selectedDeck?: Deck;
   decks: Deck[];
+  selectedDeck?: Deck;
+  selectedCard?: Card
 };
 
 const initialState: State = {
   selectedDeck: undefined,
   decks: [],
+  selectedCard: undefined
 };
 
 export default function(state = initialState, action: DeckActionTypes): State {
@@ -19,6 +22,8 @@ export default function(state = initialState, action: DeckActionTypes): State {
       return { ...state, selectedDeck: action.selectedDeck };
     case DELETE_DECK:
       return { ...state, decks: [...action.decks] };
+    case SELECT_CARD:
+      return { ...state, selectedCard: action.selectedCard };
 
     default:
       return state;
