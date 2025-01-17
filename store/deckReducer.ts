@@ -14,7 +14,7 @@ const initialState: State = {
 export default function(state = initialState, action: DeckActionTypes): State {
   switch (action.type) {
     case ADD_DECK:
-      return { ...state, decks: [...action.decks] };
+      return { ...state, decks: [...action.decks], selectedDeck: action.selectedDeck };
     case SELECT_DECK:
       return { ...state, selectedDeck: action.selectedDeck };
     case DELETE_DECK:

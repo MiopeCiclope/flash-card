@@ -7,6 +7,7 @@ export const SELECT_DECK = 'SELECT_DECK';
 interface AddDeckAction {
   type: typeof ADD_DECK;
   decks: Deck[];
+  selectedDeck?: Deck;
 }
 
 interface DeleteDeckAction {
@@ -32,14 +33,19 @@ export const addDeck = (deckList: Deck[], newDeck: Deck) => {
 
   if (hasExistingDeck) {
     updatedDecks = replaceDeck(deckList, newDeck)
+    return {
+      type: ADD_DECK,
+      decks: updatedDecks,
+      selectedDeck: newDeck
+    };
+
   } else {
     updatedDecks = [...deckList, newDeck];
+    return {
+      type: ADD_DECK,
+      decks: updatedDecks,
+    };
   }
-
-  return {
-    type: ADD_DECK,
-    decks: updatedDecks,
-  };
 };
 
 export const deleteDeck = (deckList: Deck[], deckId: string) => {

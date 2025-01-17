@@ -8,7 +8,6 @@ import 'react-native-reanimated';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '../store/store';
-
 import { useColorScheme } from '@/components/useColorScheme';
 import AddDeck from '@/components/AddDeck';
 import EditDeck from '@/components/EditDeck';

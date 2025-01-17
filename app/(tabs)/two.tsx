@@ -1,18 +1,20 @@
 import { StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useSelector } from 'react-redux';
+import { Link } from 'expo-router';
 
 export default function TabTwoScreen() {
   const deck = useSelector((state: any) => state?.deckReducer.selectedDeck);
-  console.log(deck);
   const { translation, sound, detail } = deck.cards[0].back
 
   return (
-    <View style={styles.container}>
-      <Text>{translation}</Text>
-      <Text>{sound}</Text>
-      <Text>{detail}</Text>
-    </View>
+    <Link href="/(tabs)/one">
+      <View style={styles.container}>
+        <Text>{translation}</Text>
+        <Text>{sound}</Text>
+        <Text>{detail}</Text>
+      </View>
+    </Link>
   );
 }
 
