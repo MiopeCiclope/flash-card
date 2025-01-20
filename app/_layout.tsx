@@ -5,12 +5,12 @@ import { Link, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor } from '../store/store';
 import { useColorScheme } from '@/components/useColorScheme';
 import AddDeck from '@/components/AddDeck';
 import EditDeck from '@/components/EditDeck';
+import Providers from '@/components/Providers';
+import { useSelector } from 'react-redux';
+import { Deck } from '@/models/decks';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -46,29 +46,32 @@ export default function RootLayout() {
     return null;
   }
 
-  return <RootLayoutNav />;
+  return (<Providers>
+    <RootLayoutNav />
+  </Providers>
+  )
 }
 
 function RootLayoutNav() {
+
   const colorScheme = useColorScheme();
+  const selectedDeck = useSelector((state: any) => state?.deckReducer.selectedDeck) as Deck | null;
+  const deckScreenTitle = !selectedDeck ? "Deck" : selectedDeck.name
+  const deckDetailTitle = !selectedDeck ? "New Deck" : selectedDeck.name
 
   return (
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack>
-            <Stack.Screen name="index" options={{
-              headerTitle: 'List',
-              headerRight: () => (<AddDeck />),
-            }} />
-            <Stack.Screen name="(tabs)" options={{
-              headerTitle: "Deck", headerShown: true,
-              headerRight: () => (<EditDeck />),
-            }} />
-            <Stack.Screen name="deck-detail" options={{ headerShown: true, headerTitle: "New Deck" }} />
-          </Stack>
-        </ThemeProvider>
-      </PersistGate>
-    </Provider>
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <Stack>
+        <Stack.Screen name="index" options={{
+          headerTitle: 'List',
+          headerRight: () => (<AddDeck />),
+        }} />
+        <Stack.Screen name="(tabs)" options={{
+          headerTitle: deckScreenTitle, headerShown: true,
+          headerRight: () => (<EditDeck />),
+        }} />
+        <Stack.Screen name="deck-detail" options={{ headerShown: true, headerTitle: deckDetailTitle }} />
+      </Stack>
+    </ThemeProvider>
   );
 }

@@ -1,4 +1,4 @@
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Deck as FlashDeck } from '@/models/decks';
@@ -9,30 +9,38 @@ import ConfirmModal from './ConfirmModal';
 
 const Deck = ({ deck }: { deck: FlashDeck }) => {
   const { name } = deck;
-  const [modalVisible, setModalVisible] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false);
 
   const deckList = useSelector((state: any) => state?.deckReducer.decks);
   const dispatch = useDispatch();
-  const openDeck = () => dispatch(selectDeck(deck))
+  const router = useRouter();
+
+  const openDeck = () => dispatch(selectDeck(deck));
+
   const removeDeck = () => {
-    dispatch(deleteDeck(deckList, deck.id))
-    setModalVisible(false)
-  }
+    dispatch(deleteDeck(deckList, deck.id));
+    setModalVisible(false);
+  };
+
+  const editDeck = () => {
+    openDeck()
+    router.push("/deck-detail");
+  };
 
   return (
     <View style={styles.container}>
       <Link href="/(tabs)/one" onPress={openDeck}>
         <Text style={styles.title}>{name}</Text>
-        <Ionicons name="trash" size={20} onPress={() => setModalVisible(true)} />
       </Link>
+      <Ionicons name="pencil" size={20} onPress={editDeck} />
+      <Ionicons name="trash" size={20} onPress={() => setModalVisible(true)} />
       <ConfirmModal
         visible={modalVisible}
         onYes={removeDeck}
         onNo={() => setModalVisible(false)}
       />
-
-    </View >
-  )
+    </View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -43,7 +51,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     marginTop: 5,
-  }
+  },
 });
 
 export default Deck;
