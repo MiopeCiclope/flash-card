@@ -6,6 +6,8 @@ import { Card } from '@/models/card';
 
 export default function TabTwoScreen() {
   const selectedCard = useSelector((state: any) => state?.deckReducer.selectedCard) as Card;
+  if (!selectedCard) return null
+
   const { translation, sound, detail } = selectedCard.back
 
   return (
