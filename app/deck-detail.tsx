@@ -2,7 +2,7 @@ import { Button, FlatList, TextInput, StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addDeck } from '@/store/deckAction';
+import { addDeck, selectCard } from '@/store/deckAction';
 import { Deck } from '@/models/decks';
 import { router } from 'expo-router';
 import { Card } from '@/models/card';
@@ -11,34 +11,48 @@ function generateRandomId(): string {
   return Math.random().toString(36).substring(2, 15);
 }
 
-
 export default function DeckDetail() {
   const selectedDeck = useSelector((state: any) => state?.deckReducer.selectedDeck);
+  const displayingCard = useSelector((state: any) => state?.deckReducer.selectedCard);
   const deckList = useSelector((state: any) => state?.deckReducer.decks);
   const dispatch = useDispatch();
 
+  const emptyCard: Card = {
+    id: '',
+    front: { word: '' },
+    back: { translation: '', sound: '', detail: '' },
+  }
+
+  const [selectedCard, setSelectedCard] = useState(displayingCard || emptyCard)
   const [iconName, setIconName] = useState(selectedDeck?.iconName || "");
   const [name, setName] = useState(selectedDeck?.name || "");
   const [cardList, setCardList] = useState<Card[]>(selectedDeck?.cards || []);
 
-  const [word, setWord] = useState('');
-  const [translation, setTranslation] = useState('');
-  const [sound, setSound] = useState("")
-  const [details, setDetails] = useState("")
+  const handleSave = () => {
+    if (selectedCard.front.word && selectedCard.back.translation && selectedCard.back.sound) {
+      setCardList((prevState) => {
+        const existingIndex = prevState.findIndex((c) => c.id === selectedCard.id);
+        if (existingIndex !== -1) {
+          const updatedList = [...prevState];
+          updatedList[existingIndex] = selectedCard;
 
-  const handleSubmit = () => {
-    dispatch(addDeck(deckList, { id: !selectedDeck ? generateRandomId() : selectedDeck.id, name: name, iconName: iconName, cards: cardList } as Deck))
-    router.back()
+          if (selectedCard.id === displayingCard.id) {
+            dispatch(selectCard(selectedCard))
+          }
+
+          return updatedList;
+        } else {
+          return [...prevState, { ...selectedCard, id: generateRandomId() }];
+        }
+      });
+
+      setSelectedCard(emptyCard)
+    }
   };
 
-  const handleSave = () => {
-    if (word && translation && sound) {
-      setCardList(prevState => [...prevState, { front: { word }, back: { translation, sound, details } } as any as Card])
-      setWord("")
-      setTranslation("")
-      setSound("")
-      setDetails("")
-    }
+  const handleSubmit = () => {
+    dispatch(addDeck(deckList, { id: !selectedDeck ? generateRandomId() : selectedDeck.id, name: name, iconName: iconName, cards: cardList } as Deck));
+    router.back();
   };
 
   return (
@@ -57,10 +71,33 @@ export default function DeckDetail() {
         placeholder='Icon'
       />
 
-      <TextInput style={styles.inputStyle} value={word} onChangeText={setWord} placeholder='word' />
-      <TextInput style={styles.inputStyle} value={translation} onChangeText={setTranslation} placeholder='translation' />
-      <TextInput style={styles.inputStyle} value={sound} onChangeText={setSound} placeholder='sound' />
-      <TextInput style={styles.inputStyle} value={details} onChangeText={setDetails} placeholder='details' />
+      <TextInput style={styles.inputStyle} value={selectedCard?.front.word || ''} onChangeText={
+        (text: string) => setSelectedCard({
+          ...selectedCard,
+          front: { ...selectedCard.front, word: text },
+        })
+      } placeholder='word' />
+
+      <TextInput style={styles.inputStyle} value={selectedCard?.back.translation || ''} onChangeText={
+        (text: string) => setSelectedCard({
+          ...selectedCard,
+          back: { ...selectedCard.back, translation: text },
+        })
+      } placeholder='translation' />
+
+      <TextInput style={styles.inputStyle} value={selectedCard?.back.sound || ''} onChangeText={
+        (text: string) => setSelectedCard({
+          ...selectedCard,
+          back: { ...selectedCard.back, sound: text },
+        })
+      } placeholder='sound' />
+
+      <TextInput style={styles.inputStyle} value={selectedCard?.back.detail || ''} onChangeText={
+        (text: string) => setSelectedCard({
+          ...selectedCard,
+          back: { ...selectedCard.back, detail: text },
+        })
+      } placeholder='details' />
 
       <Button title="Save" onPress={handleSave} />
 
@@ -76,7 +113,6 @@ export default function DeckDetail() {
       <Button title="Submit" onPress={handleSubmit} />
     </View>
   );
-
 }
 
 const styles = StyleSheet.create({

@@ -1,4 +1,5 @@
 export interface Card {
+  id: string;
   front: {
     word: string;
   };

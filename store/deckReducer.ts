@@ -9,8 +9,8 @@ type State = {
 };
 
 const initialState: State = {
-  selectedDeck: undefined,
   decks: [],
+  selectedDeck: undefined,
   selectedCard: undefined
 };
 

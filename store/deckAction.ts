@@ -73,7 +73,7 @@ export const addCard = (deckList: Deck[], newDeck: Deck) => {
   };
 }
 
-export const selectCard = (card: Card | null) => (
+export const selectCard = (card?: Card) => (
   {
     type: SELECT_CARD,
     selectedCard: card,
