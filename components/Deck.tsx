@@ -1,6 +1,6 @@
 import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Deck as FlashDeck } from '@/models/decks';
 import { deleteDeck, selectDeck } from '@/store/deckAction';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,17 +23,23 @@ const Deck = ({ deck }: { deck: FlashDeck }) => {
   };
 
   const editDeck = () => {
-    openDeck()
-    router.push("/deck-detail");
+    openDeck();
+    router.push('/deck-detail');
   };
 
   return (
-    <View style={styles.container}>
-      <Link href="/(tabs)/one" onPress={openDeck}>
+    <View style={styles.card}>
+      <Link href="/(tabs)/one" onPress={openDeck} style={styles.link}>
         <Text style={styles.title}>{name}</Text>
       </Link>
-      <Ionicons name="pencil" size={20} onPress={editDeck} />
-      <Ionicons name="trash" size={20} onPress={() => setModalVisible(true)} />
+      <View style={styles.actions}>
+        <TouchableOpacity onPress={editDeck} style={styles.actionButton}>
+          <Ionicons name="pencil" size={20} color="#555" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.actionButton}>
+          <Ionicons name="trash" size={20} color="#d9534f" />
+        </TouchableOpacity>
+      </View>
       <ConfirmModal
         visible={modalVisible}
         onYes={removeDeck}
@@ -44,13 +50,39 @@ const Deck = ({ deck }: { deck: FlashDeck }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  card: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    padding: 16,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2, // Adds a shadow on Android
+  },
+  link: {
+    flex: 1,
+    marginRight: 10,
   },
   title: {
     fontSize: 18,
-    marginTop: 5,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  actionButton: {
+    marginHorizontal: 8,
+    padding: 8,
+    borderRadius: 4,
+    backgroundColor: '#f5f5f5',
   },
 });
 
