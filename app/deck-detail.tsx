@@ -2,16 +2,19 @@ import { Button, FlatList, TextInput, StyleSheet } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addDeck, selectCard } from '@/store/deckAction';
+import { addDeck, deleteCard, selectCard } from '@/store/deckAction';
 import { Deck } from '@/models/decks';
 import { router } from 'expo-router';
 import { Card } from '@/models/card';
+import ConfirmModal from '@/components/ConfirmModal';
+import Ionicons from '@expo/vector-icons/build/Ionicons';
 
 function generateRandomId(): string {
   return Math.random().toString(36).substring(2, 15);
 }
 
 export default function DeckDetail() {
+  const [deleteCardId, setDeleteCardId] = useState<string | null>(null);
   const selectedDeck = useSelector((state: any) => state?.deckReducer.selectedDeck);
   const displayingCard = useSelector((state: any) => state?.deckReducer.selectedCard);
   const deckList = useSelector((state: any) => state?.deckReducer.decks);
@@ -54,6 +57,13 @@ export default function DeckDetail() {
     dispatch(addDeck(deckList, { id: !selectedDeck ? generateRandomId() : selectedDeck.id, name: name, iconName: iconName, cards: cardList } as Deck));
     router.back();
   };
+
+  const removeCard = (deckList: Deck[], deck: Deck, cardId: string | null) => {
+    if (!cardId) return
+
+    dispatch(deleteCard(deckList, deck, cardId));
+    setDeleteCardId(null)
+  }
 
   return (
     <View>
@@ -107,8 +117,15 @@ export default function DeckDetail() {
         (
           <View>
             <Text>{item.front.word}</Text>
+            <Ionicons name="trash" size={20} onPress={() => setDeleteCardId(item.id)} />
           </View>
         )}
+      />
+
+      <ConfirmModal
+        visible={!!deleteCardId}
+        onYes={() => { removeCard(deckList, selectedDeck, deleteCardId) }}
+        onNo={() => setDeleteCardId(null)}
       />
       <Button title="Submit" onPress={handleSubmit} />
     </View>

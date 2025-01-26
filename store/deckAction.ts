@@ -3,6 +3,7 @@ import { Deck } from "@/models/decks";
 
 export const ADD_DECK = 'ADD_DECK';
 export const DELETE_DECK = 'DELETE_DECK';
+export const DELETE_CARD = 'DELETE_CARD';
 export const SELECT_DECK = 'SELECT_DECK';
 export const SELECT_CARD = 'SELECT_CARD';
 
@@ -17,6 +18,11 @@ interface DeleteDeckAction {
   decks: Deck[];
 }
 
+interface DeleteCardAction {
+  type: typeof DELETE_CARD;
+  decks: Deck[];
+}
+
 interface SelectDeckAction {
   type: typeof SELECT_DECK;
   selectedDeck?: Deck;
@@ -27,7 +33,7 @@ interface SelectCardAction {
   selectedCard?: Card;
 }
 
-export type DeckActionTypes = AddDeckAction | SelectDeckAction | DeleteDeckAction | SelectCardAction
+export type DeckActionTypes = AddDeckAction | SelectDeckAction | DeleteDeckAction | SelectCardAction | DeleteCardAction
 
 const replaceDeck = (deckList: Deck[], newDeck: Deck) => deckList.map(deck =>
   deck.id === newDeck.id ? newDeck : deck
@@ -54,6 +60,22 @@ export const addDeck = (deckList: Deck[], newDeck: Deck) => {
     };
   }
 };
+
+export const deleteCard = (deckList: Deck[], deck?: Deck, cardId?: string) => {
+  const newCardList = deck?.cards?.filter(card => card.id !== cardId);
+  let newDeckList: Deck[] = []
+
+  if (deck && newCardList) {
+    const newDeck: Deck = { ...deck, cards: newCardList }
+    newDeckList = replaceDeck(deckList, newDeck)
+  }
+
+  return {
+    type: DELETE_CARD,
+    decks: newDeckList,
+  };
+}
+
 
 export const deleteDeck = (deckList: Deck[], deckId: string) => {
   const newDeckList = deckList.filter(deck => deck.id !== deckId);

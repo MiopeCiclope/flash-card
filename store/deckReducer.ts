@@ -1,5 +1,5 @@
 import { Deck } from '@/models/decks';
-import { ADD_DECK, DELETE_DECK, DeckActionTypes, SELECT_CARD, SELECT_DECK } from './deckAction';
+import { ADD_DECK, DELETE_CARD, DELETE_DECK, DeckActionTypes, SELECT_CARD, SELECT_DECK } from './deckAction';
 import { Card } from '@/models/card';
 
 type State = {
@@ -24,7 +24,8 @@ export default function(state = initialState, action: DeckActionTypes): State {
       return { ...state, decks: [...action.decks] };
     case SELECT_CARD:
       return { ...state, selectedCard: action.selectedCard };
-
+    case DELETE_CARD:
+      return { ...state, decks: [...action.decks], selectedCard: undefined };
     default:
       return state;
   }
