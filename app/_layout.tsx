@@ -1,7 +1,7 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Link, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
@@ -53,7 +53,6 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-
   const colorScheme = useColorScheme();
   const selectedDeck = useSelector((state: any) => state?.deckReducer.selectedDeck) as Deck | null;
   const deckScreenTitle = !selectedDeck ? "Deck" : selectedDeck.name
@@ -71,6 +70,7 @@ function RootLayoutNav() {
           headerRight: () => (<EditDeck />),
         }} />
         <Stack.Screen name="deck-detail" options={{ headerShown: true, headerTitle: deckDetailTitle }} />
+        <Stack.Screen name="export-data" options={{ headerShown: true, headerTitle: "Export" }} />
       </Stack>
     </ThemeProvider>
   );
