@@ -19,6 +19,7 @@ const DeckScreen = () => {
         placeholder="Enter content"
         value={inputValue}
         onChangeText={setInputValue}
+        placeholderTextColor="lightgray"
       />
       <Button title="Save" onPress={handleSave} />
     </View>

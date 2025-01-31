@@ -1,4 +1,4 @@
-import { selectCard, selectDeck } from '@/store/deckAction';
+import { selectCard, unselectDeck } from '@/store/deckAction';
 import Ionicons from '@expo/vector-icons/build/Ionicons';
 import React, { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
@@ -10,7 +10,7 @@ const AddDeck = () => {
   const router = useRouter();
 
   const handlePress = useCallback(() => {
-    dispatch(selectDeck());
+    dispatch(unselectDeck());
     dispatch(selectCard());
     router.push('/deck-detail'); // Navigate to the desired route
   }, [dispatch, router]);

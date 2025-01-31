@@ -20,7 +20,11 @@ const ExportData = () => {
 
   return (
     <>
-      <TextInput value={jsonData} />
+      <TextInput
+        value={jsonData}
+        multiline={true}
+        placeholderTextColor="lightgray"
+      />
       <Button title="Copy to Clipboard" onPress={copyToClipboard} />
     </>
   )

@@ -20,6 +20,7 @@ export default function DeckDetail() {
   const deckList = useSelector((state: any) => state?.deckReducer.decks);
   const dispatch = useDispatch();
 
+  console.log(selectedDeck)
   const emptyCard: Card = {
     id: '',
     front: { word: '' },
@@ -79,6 +80,7 @@ export default function DeckDetail() {
         onChangeText={(text: string) => setName(text)}
         value={name}
         placeholder="Deck Name"
+        placeholderTextColor="lightgray"
       />
 
       <TextInput
@@ -86,6 +88,7 @@ export default function DeckDetail() {
         onChangeText={(text: string) => setIconName(text)}
         value={iconName}
         placeholder="Icon"
+        placeholderTextColor="lightgray"
       />
 
       <TextInput
@@ -98,6 +101,7 @@ export default function DeckDetail() {
           })
         }
         placeholder="Word"
+        placeholderTextColor="lightgray"
       />
 
       <TextInput
@@ -110,6 +114,7 @@ export default function DeckDetail() {
           })
         }
         placeholder="Translation"
+        placeholderTextColor="lightgray"
       />
 
       <TextInput
@@ -122,6 +127,7 @@ export default function DeckDetail() {
           })
         }
         placeholder="Sound"
+        placeholderTextColor="lightgray"
       />
 
       <TextInput
@@ -134,6 +140,7 @@ export default function DeckDetail() {
           })
         }
         placeholder="Details"
+        placeholderTextColor="lightgray"
       />
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>

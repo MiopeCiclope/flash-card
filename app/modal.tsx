@@ -18,6 +18,7 @@ export default function ModalScreen() {
         onChangeText={(text: string) => setName(text)}
         value={name}
         placeholder='Deck Name'
+        placeholderTextColor="lightgray"
       />
 
       <TextInput
@@ -25,6 +26,7 @@ export default function ModalScreen() {
         onChangeText={(text: string) => setIconName(text)}
         value={iconName}
         placeholder='Icon'
+        placeholderTextColor="lightgray"
       />
 
       <Button title="Submit" onPress={handleSubmit} />
