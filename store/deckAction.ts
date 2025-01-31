@@ -6,11 +6,17 @@ export const DELETE_DECK = 'DELETE_DECK';
 export const DELETE_CARD = 'DELETE_CARD';
 export const SELECT_DECK = 'SELECT_DECK';
 export const SELECT_CARD = 'SELECT_CARD';
+export const RESTORE = "RESTORE"
 
 interface AddDeckAction {
   type: typeof ADD_DECK;
   decks: Deck[];
   selectedDeck?: Deck;
+}
+
+interface RestoreAction {
+  type: typeof RESTORE;
+  payload: any;
 }
 
 interface DeleteDeckAction {
@@ -33,7 +39,7 @@ interface SelectCardAction {
   selectedCard?: Card;
 }
 
-export type DeckActionTypes = AddDeckAction | SelectDeckAction | DeleteDeckAction | SelectCardAction | DeleteCardAction
+export type DeckActionTypes = AddDeckAction | SelectDeckAction | DeleteDeckAction | SelectCardAction | DeleteCardAction | RestoreAction
 
 const replaceDeck = (deckList: Deck[], newDeck: Deck) => deckList.map(deck =>
   deck.id === newDeck.id ? newDeck : deck
@@ -106,3 +112,12 @@ export const selectDeck = (deck?: Deck) => (
     type: SELECT_DECK,
     selectedDeck: deck,
   })
+
+export const restore = (payload: any) => {
+  console.log(payload)
+  return (
+    {
+      type: RESTORE,
+      payload: JSON.parse(payload)
+    })
+}

@@ -93,6 +93,13 @@ function RootLayoutNav() {
           }}
         />
         <Drawer.Screen
+          name="import-data"
+          options={{
+            headerTitle: "Restore",
+            title: "Restore",
+          }}
+        />
+        <Drawer.Screen
           name="+not-found"
           options={{
             drawerItemStyle: { display: 'none' }
