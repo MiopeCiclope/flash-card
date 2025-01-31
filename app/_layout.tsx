@@ -1,7 +1,7 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Drawer } from 'expo-router/drawer';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
@@ -11,6 +11,7 @@ import EditDeck from '@/components/EditDeck';
 import Providers from '@/components/Providers';
 import { useSelector } from 'react-redux';
 import { Deck } from '@/models/decks';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -18,7 +19,6 @@ export {
 } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: 'index',
 };
 
@@ -31,7 +31,6 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -46,32 +45,66 @@ export default function RootLayout() {
     return null;
   }
 
-  return (<Providers>
-    <RootLayoutNav />
-  </Providers>
-  )
+  return (
+    <Providers>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <RootLayoutNav />
+      </GestureHandlerRootView>
+    </Providers>
+  );
 }
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const selectedDeck = useSelector((state: any) => state?.deckReducer.selectedDeck) as Deck | null;
-  const deckScreenTitle = !selectedDeck ? "Deck" : selectedDeck.name
-  const deckDetailTitle = !selectedDeck ? "New Deck" : selectedDeck.name
+  const deckScreenTitle = !selectedDeck ? "Deck" : selectedDeck.name;
+  const deckDetailTitle = !selectedDeck ? "New Deck" : selectedDeck.name;
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="index" options={{
-          headerTitle: 'List',
-          headerRight: () => (<AddDeck />),
-        }} />
-        <Stack.Screen name="(tabs)" options={{
-          headerTitle: deckScreenTitle, headerShown: true,
-          headerRight: () => (<EditDeck />),
-        }} />
-        <Stack.Screen name="deck-detail" options={{ headerShown: true, headerTitle: deckDetailTitle }} />
-        <Stack.Screen name="export-data" options={{ headerShown: true, headerTitle: "Export" }} />
-      </Stack>
+      <Drawer>
+        <Drawer.Screen
+          name="index"
+          options={{
+            headerTitle: 'Deck List',
+            title: 'Deck List',
+            headerRight: () => <AddDeck />,
+          }}
+        />
+        <Drawer.Screen
+          name="(tabs)"
+          options={{
+            headerTitle: deckScreenTitle,
+            headerRight: () => <EditDeck />,
+            drawerItemStyle: { display: 'none' }
+          }}
+        />
+        <Drawer.Screen
+          name="deck-detail"
+          options={{
+            headerTitle: deckDetailTitle,
+            drawerItemStyle: { display: 'none' }
+          }}
+        />
+        <Drawer.Screen
+          name="modal"
+          options={{
+            drawerItemStyle: { display: 'none' }
+          }}
+        />
+        <Drawer.Screen
+          name="+not-found"
+          options={{
+            drawerItemStyle: { display: 'none' }
+          }}
+        />
+        <Drawer.Screen
+          name="export-data"
+          options={{
+            headerTitle: "Backup",
+            title: "Backup",
+          }} />
+      </Drawer>
     </ThemeProvider>
   );
 }
