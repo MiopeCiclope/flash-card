@@ -113,7 +113,6 @@ export const selectCard = (card?: Card) => (
   })
 
 export const selectDeck = (deck?: Deck) => {
-  console.log("action", deck)
   return (
     {
       type: SELECT_DECK,
@@ -122,16 +121,13 @@ export const selectDeck = (deck?: Deck) => {
 }
 
 export const unselectDeck = () => {
-  console.log("unselect")
   return (
-
     {
       type: UNSELECT_DECK,
     })
 }
 
 export const restore = (payload: any) => {
-  console.log(payload)
   return (
     {
       type: RESTORE,

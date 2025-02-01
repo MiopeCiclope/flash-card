@@ -7,8 +7,6 @@ export default function ModalScreen() {
   const [name, setName] = useState("");
 
   const handleSubmit = () => {
-    console.log('Submitted icon:', iconName);
-    console.log('Submitted icon:', name);
   };
 
   return (
