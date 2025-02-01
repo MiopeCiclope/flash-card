@@ -1,4 +1,4 @@
-import { Button, FlatList, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { FlatList, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,10 +8,17 @@ import { router } from 'expo-router';
 import { Card } from '@/models/card';
 import ConfirmModal from '@/components/ConfirmModal';
 import Ionicons from '@expo/vector-icons/build/Ionicons';
+import useDeckState from '@/hooks/useDeckState';
 
 function generateRandomId(): string {
   return Math.random().toString(36).substring(2, 15);
 }
+
+const emptyCard: Card = {
+  id: '',
+  front: { word: '' },
+  back: { translation: '', sound: '', detail: '' },
+};
 
 export default function DeckDetail() {
   const [deleteCardId, setDeleteCardId] = useState<string | null>(null);
@@ -19,18 +26,16 @@ export default function DeckDetail() {
   const displayingCard = useSelector((state: any) => state?.deckReducer.selectedCard);
   const deckList = useSelector((state: any) => state?.deckReducer.decks);
   const dispatch = useDispatch();
-
-  console.log(selectedDeck)
-  const emptyCard: Card = {
-    id: '',
-    front: { word: '' },
-    back: { translation: '', sound: '', detail: '' },
-  };
-
-  const [selectedCard, setSelectedCard] = useState(displayingCard || emptyCard);
-  const [iconName, setIconName] = useState(selectedDeck?.iconName || '');
-  const [name, setName] = useState(selectedDeck?.name || '');
-  const [cardList, setCardList] = useState<Card[]>(selectedDeck?.cards || []);
+  const {
+    selectedCard,
+    setSelectedCard,
+    iconName,
+    setIconName,
+    name,
+    setName,
+    cardList,
+    setCardList,
+  } = useDeckState(selectedDeck, displayingCard, deckList)
 
   const handleSave = () => {
     if (selectedCard.front.word && selectedCard.back.translation && selectedCard.back.sound) {

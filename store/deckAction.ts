@@ -113,7 +113,7 @@ export const selectCard = (card?: Card) => (
   })
 
 export const selectDeck = (deck?: Deck) => {
-  console.log(deck)
+  console.log("action", deck)
   return (
     {
       type: SELECT_DECK,
