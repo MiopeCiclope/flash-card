@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'expo-router';
 import { PanGestureHandler, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Deck } from '@/models/decks';
 import { Card } from '@/models/card';
 import { selectCard } from '@/store/deckAction';
+import { CardFront } from '@/components/CardFront';
+import { CardBack } from '@/components/CardBack';
 
 enum SwipeDirection {
   SwipeRight = 'SwipeRight',
@@ -23,7 +24,8 @@ const getSwipeDirection = (translationX: number, translationY: number): SwipeDir
   }
 };
 
-export default function TabOneScreen() {
+export default function CardDisplay() {
+  const [isFront, setIsFront] = useState(true)
   const deck = useSelector((state: any) => state?.deckReducer.selectedDeck) as Deck | null;
   const selectedCard = useSelector((state: any) => state?.deckReducer.selectedCard) as Card | null;
   const dispatch = useDispatch()
@@ -54,6 +56,7 @@ export default function TabOneScreen() {
   const handleGestureEnd = (event: any) => {
     const { translationX, translationY } = event.nativeEvent;
     const swipeDirection = getSwipeDirection(translationX, translationY);
+    setIsFront(true)
 
     switch (swipeDirection) {
       case SwipeDirection.SwipeLeft:
@@ -81,17 +84,9 @@ export default function TabOneScreen() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <PanGestureHandler onEnded={handleGestureEnd}>
         <View style={styles.container}>
-          <View style={styles.card}>
-            {selectedCard ? (
-              <>
-                <Link href="/(tabs)/two">
-                  <Text style={styles.title}>{selectedCard.front.word}</Text>
-                </Link>
-              </>
-            ) : (
-              <Text style={styles.noCardsMessage}>No cards in the deck</Text>
-            )}
-          </View>
+          <TouchableOpacity onPress={() => setIsFront(!isFront)} style={styles.card}>
+            {isFront ? (<CardFront card={selectedCard} />) : (<CardBack card={selectedCard} />)}
+          </TouchableOpacity>
         </View>
       </PanGestureHandler>
     </GestureHandlerRootView>
@@ -122,29 +117,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-  },
-  noCardsMessage: {
-    fontSize: 18,
-    color: 'red',
-    textAlign: 'center',
-  },
-  cardLines: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  line: {
-    height: 1,
-    backgroundColor: '#e0e0e0',
-    marginVertical: 14,
   },
   rippedEdge: {
     position: 'absolute',

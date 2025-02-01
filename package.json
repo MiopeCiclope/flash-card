@@ -8,7 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest --watchAll",
-    "build": "expo export && mv dist web-build",
+    "build": "expo export -p web --output-dir web-build",
     "deploy": "netlify deploy --prod"
   },
   "jest": {

@@ -72,7 +72,7 @@ function RootLayoutNav() {
           }}
         />
         <Drawer.Screen
-          name="(tabs)"
+          name="card-display"
           options={{
             headerTitle: deckScreenTitle,
             headerRight: () => <EditDeck />,

@@ -29,7 +29,7 @@ const Deck = ({ deck }: { deck: FlashDeck }) => {
 
   return (
     <View style={styles.card}>
-      <Link href="/(tabs)/one" onPress={openDeck} style={styles.link}>
+      <Link href="/card-display" onPress={openDeck} style={styles.link}>
         <Text style={styles.title}>{name}</Text>
       </Link>
       <View style={styles.actions}>
