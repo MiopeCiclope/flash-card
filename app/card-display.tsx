@@ -118,16 +118,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  rippedEdge: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 20,
-    backgroundColor: '#fff8dc',
-    borderTopWidth: 1,
-    borderTopColor: '#d3d3d3',
-    zIndex: 1,
-    transform: [{ rotate: '-2deg' }],
-  },
 });

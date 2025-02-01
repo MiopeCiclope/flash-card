@@ -28,10 +28,11 @@ const DeckScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    height: "100%",
     padding: 16,
   },
   input: {
+    flex: 1,
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
