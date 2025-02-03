@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { PanGestureHandler, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Deck } from '@/models/decks';
@@ -7,6 +7,7 @@ import { Card } from '@/models/card';
 import { selectCard } from '@/store/deckAction';
 import { CardFront } from '@/components/CardFront';
 import { CardBack } from '@/components/CardBack';
+import { useIsFocused } from '@react-navigation/native';
 
 enum SwipeDirection {
   SwipeRight = 'SwipeRight',
@@ -29,12 +30,13 @@ export default function CardDisplay() {
   const deck = useSelector((state: any) => state?.deckReducer.selectedDeck) as Deck | null;
   const selectedCard = useSelector((state: any) => state?.deckReducer.selectedCard) as Card | null;
   const dispatch = useDispatch()
+  const isFocused = useIsFocused();
 
   const [displayedCards, setDisplayedCards] = useState<Set<number>>(new Set());
   const hasCard = deck && deck.cards && deck.cards.length > 0;
 
   useEffect(() => {
-    if (hasCard && deck?.cards?.length && !selectedCard) {
+    if (isFocused && hasCard && deck?.cards?.length && !selectedCard) {
       const firstCardIndex = Math.floor(Math.random() * deck.cards.length);
       dispatch(selectCard(deck.cards[firstCardIndex]));
 

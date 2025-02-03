@@ -2,7 +2,7 @@ import { Link, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Deck as FlashDeck } from '@/models/decks';
-import { deleteDeck, selectDeck } from '@/store/deckAction';
+import { deleteDeck, selectCard, selectDeck } from '@/store/deckAction';
 import { useDispatch, useSelector } from 'react-redux';
 import Ionicons from '@expo/vector-icons/build/Ionicons';
 import ConfirmModal from './ConfirmModal';
@@ -16,6 +16,7 @@ const Deck = ({ deck }: { deck: FlashDeck }) => {
   const router = useRouter();
 
   const openDeck = () => dispatch(selectDeck(deck));
+  const cleanCard = () => dispatch(selectCard());
 
   const removeDeck = () => {
     dispatch(deleteDeck(deckList, deck.id));
@@ -23,6 +24,7 @@ const Deck = ({ deck }: { deck: FlashDeck }) => {
   };
 
   const editDeck = () => {
+    cleanCard();
     openDeck();
     router.push('/deck-detail');
   };

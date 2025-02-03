@@ -26,6 +26,7 @@ export default function DeckDetail() {
   const displayingCard = useSelector((state: any) => state?.deckReducer.selectedCard);
   const deckList = useSelector((state: any) => state?.deckReducer.decks);
   const dispatch = useDispatch();
+
   const {
     selectedCard,
     setSelectedCard,
@@ -193,6 +194,7 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     paddingHorizontal: 8,
     backgroundColor: '#fff',
+    fontSize: 16,
   },
   saveButton: {
     backgroundColor: '#007bff',
