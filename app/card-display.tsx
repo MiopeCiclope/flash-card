@@ -31,6 +31,7 @@ export default function CardDisplay() {
   const selectedCard = useSelector((state: any) => state?.deckReducer.selectedCard) as Card | null;
   const dispatch = useDispatch()
   const isFocused = useIsFocused();
+  //const [previousIndex, setPreviousIndex] =
 
   const [displayedCards, setDisplayedCards] = useState<Set<number>>(new Set());
   const hasCard = deck && deck.cards && deck.cards.length > 0;

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addDeck, deleteCard, selectCard } from '@/store/deckAction';
 import { Deck } from '@/models/decks';
-import { router } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { Card } from '@/models/card';
 import ConfirmModal from '@/components/ConfirmModal';
 import Ionicons from '@expo/vector-icons/build/Ionicons';
@@ -21,6 +21,7 @@ const emptyCard: Card = {
 };
 
 export default function DeckDetail() {
+  const router = useRouter()
   const [deleteCardId, setDeleteCardId] = useState<string | null>(null);
   const selectedDeck = useSelector((state: any) => state?.deckReducer.selectedDeck);
   const displayingCard = useSelector((state: any) => state?.deckReducer.selectedCard);

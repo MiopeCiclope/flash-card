@@ -1,4 +1,4 @@
-import { Link, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Deck as FlashDeck } from '@/models/decks';
@@ -15,7 +15,10 @@ const Deck = ({ deck }: { deck: FlashDeck }) => {
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const openDeck = () => dispatch(selectDeck(deck));
+  const openDeck = () => {
+    router.push('/card-display');
+    dispatch(selectDeck(deck));
+  }
   const cleanCard = () => dispatch(selectCard());
 
   const removeDeck = () => {
@@ -31,9 +34,9 @@ const Deck = ({ deck }: { deck: FlashDeck }) => {
 
   return (
     <View style={styles.card}>
-      <Link href="/card-display" onPress={openDeck} style={styles.link}>
+      <TouchableOpacity onPress={openDeck} style={styles.link}>
         <Text style={styles.title}>{name}</Text>
-      </Link>
+      </TouchableOpacity>
       <View style={styles.actions}>
         <TouchableOpacity onPress={editDeck} style={styles.actionButton}>
           <Ionicons name="pencil" size={20} color="#555" />
