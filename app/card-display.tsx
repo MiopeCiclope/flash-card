@@ -17,27 +17,38 @@ enum SwipeDirection {
   None = 'None',
 }
 
-const getSwipeDirection = (translationX: number, translationY: number): SwipeDirection => {
+const getSwipeDirection = (
+  translationX: number,
+  translationY: number,
+  threshold: number = 10
+): SwipeDirection => {
   if (Math.abs(translationX) > Math.abs(translationY)) {
-    return translationX > 0 ? SwipeDirection.SwipeRight : SwipeDirection.SwipeLeft;
+    if (Math.abs(translationX) > threshold) {
+      const direction = translationX > 0 ? SwipeDirection.SwipeRight : SwipeDirection.SwipeLeft;
+      return direction;
+    }
   } else {
-    return translationY > 0 ? SwipeDirection.SwipeDown : SwipeDirection.SwipeUp;
+    if (Math.abs(translationY) > threshold) {
+      const direction = translationY > 0 ? SwipeDirection.SwipeDown : SwipeDirection.SwipeUp;
+      return direction;
+    }
   }
+  return SwipeDirection.None;
 };
-
 export default function CardDisplay() {
   const [isFront, setIsFront] = useState(true)
   const deck = useSelector((state: any) => state?.deckReducer.selectedDeck) as Deck | null;
   const selectedCard = useSelector((state: any) => state?.deckReducer.selectedCard) as Card | null;
   const dispatch = useDispatch()
   const isFocused = useIsFocused();
-  //const [previousIndex, setPreviousIndex] =
+  const [previousCard, setPreviousCard] = useState(-3)
 
   const [displayedCards, setDisplayedCards] = useState<Set<number>>(new Set());
   const hasCard = deck && deck.cards && deck.cards.length > 0;
 
   useEffect(() => {
-    if (isFocused && hasCard && deck?.cards?.length && !selectedCard) {
+    if (isFocused && hasCard && deck?.cards?.length && !selectedCard && displayedCards.size === 0) {
+      console.log("fudeu")
       const firstCardIndex = Math.floor(Math.random() * deck.cards.length);
       dispatch(selectCard(deck.cards[firstCardIndex]));
 
@@ -60,23 +71,58 @@ export default function CardDisplay() {
     const { translationX, translationY } = event.nativeEvent;
     const swipeDirection = getSwipeDirection(translationX, translationY);
     setIsFront(true)
+    console.log("display", displayedCards.size)
+    console.log("previous", previousCard)
 
     switch (swipeDirection) {
       case SwipeDirection.SwipeLeft:
         const newCard = getRandomCard();
-        if (newCard) {
+        if (previousCard !== -3 && (previousCard + 2 < displayedCards.size)) {
+          console.log("previous")
+          const next = previousCard < -1 ? 1 : previousCard + 2
+          console.log("next", next)
+          const cardDeckIndex = Array.from(displayedCards)[next]
+
+          if (deck?.cards) {
+            const cardToDisplay = deck.cards[cardDeckIndex]
+
+            console.log(cardToDisplay)
+            setPreviousCard(previousCard + 1)
+            dispatch(selectCard(cardToDisplay));
+          }
+        } else if (newCard) {
+          console.log("random")
           const newDisplayedCards = new Set(displayedCards);
           if (deck?.cards) {
             newDisplayedCards.add(deck.cards.indexOf(newCard));
+            setPreviousCard(newDisplayedCards.size - 2)
           }
           setDisplayedCards(newDisplayedCards);
           dispatch(selectCard(newCard));
         } else {
+          console.log("reset")
           const restartSet = new Set<number>()
           setDisplayedCards(restartSet);
+          setPreviousCard(-1)
 
           if (deck?.cards) {
             dispatch(selectCard(deck?.cards[[...restartSet][0]]));
+          }
+        }
+        break;
+      case SwipeDirection.SwipeRight:
+        if (previousCard === -1) {
+          console.log("fim tras")
+          setIsFront(true)
+          setPreviousCard(-2)
+          dispatch(selectCard());
+        } else if (previousCard > -1) {
+          console.log("voltando")
+          setPreviousCard(previousCard - 1)
+          const cardDeckIndex = Array.from(displayedCards)[previousCard]
+
+          if (deck?.cards) {
+            dispatch(selectCard(deck.cards[cardDeckIndex]));
           }
         }
         break;
