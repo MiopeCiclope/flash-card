@@ -41,7 +41,7 @@ export default function CardDisplay() {
   const selectedCard = useSelector((state: any) => state?.deckReducer.selectedCard) as Card | null;
   const dispatch = useDispatch()
   const isFocused = useIsFocused();
-  const [previousCard, setPreviousCard] = useState(-3)
+  const [current, setCurrent] = useState<number>(0)
 
   const [displayedCards, setDisplayedCards] = useState<Set<number>>(new Set());
   const hasCard = deck && deck.cards && deck.cards.length > 0;
@@ -56,6 +56,7 @@ export default function CardDisplay() {
       initialSet.add(firstCardIndex);
 
       setDisplayedCards(initialSet);
+      setCurrent(0)
     }
   }, [deck, selectedCard, dispatch]);
 
@@ -72,55 +73,63 @@ export default function CardDisplay() {
     const swipeDirection = getSwipeDirection(translationX, translationY);
     setIsFront(true)
     console.log("display", displayedCards.size)
-    console.log("previous", previousCard)
+    console.log("previous", current)
 
     switch (swipeDirection) {
       case SwipeDirection.SwipeLeft:
         const newCard = getRandomCard();
-        if (previousCard !== -3 && (previousCard + 2 < displayedCards.size)) {
-          console.log("previous")
-          const next = previousCard < -1 ? 1 : previousCard + 2
-          console.log("next", next)
-          const cardDeckIndex = Array.from(displayedCards)[next]
 
-          if (deck?.cards) {
-            const cardToDisplay = deck.cards[cardDeckIndex]
-
-            console.log(cardToDisplay)
-            setPreviousCard(previousCard + 1)
-            dispatch(selectCard(cardToDisplay));
-          }
-        } else if (newCard) {
-          console.log("random")
-          const newDisplayedCards = new Set(displayedCards);
-          if (deck?.cards) {
-            newDisplayedCards.add(deck.cards.indexOf(newCard));
-            setPreviousCard(newDisplayedCards.size - 2)
-          }
-          setDisplayedCards(newDisplayedCards);
-          dispatch(selectCard(newCard));
-        } else {
-          console.log("reset")
+        // current is the last in displayedCards and there is no card left
+        if (newCard === null && current === (displayedCards.size - 1)) {
+          // current = 0
+          // get a new random card
+          console.log("case 3: restart")
           const restartSet = new Set<number>()
           setDisplayedCards(restartSet);
-          setPreviousCard(-1)
 
           if (deck?.cards) {
             dispatch(selectCard(deck?.cards[[...restartSet][0]]));
           }
+
+          // there is more cards and it is the last one
+        } else if (newCard !== null && current === (displayedCards.size - 1)) {
+          // current + 1
+          // get a new random card
+
+          console.log("case 1")
+          setCurrent(current + 1)
+          const newDisplayedCards = new Set(displayedCards);
+          if (deck?.cards) {
+            newDisplayedCards.add(deck.cards.indexOf(newCard));
+          }
+          setDisplayedCards(newDisplayedCards);
+          dispatch(selectCard(newCard));
+
+          // current is not the last displayed
+        } else {
+          // current + 1
+          // get next card from displyed
+          console.log("case 2")
+          const next = current + 1
+          setCurrent(next)
+          const cardDeckIndex = Array.from(displayedCards)[next]
+
+          if (deck?.cards) {
+            const cardToDisplay = deck.cards[cardDeckIndex]
+            dispatch(selectCard(cardToDisplay));
+          }
         }
         break;
       case SwipeDirection.SwipeRight:
-        if (previousCard === -1) {
-          console.log("fim tras")
+        if (current === 0) {
           setIsFront(true)
-          setPreviousCard(-2)
+          setCurrent(-1)
           dispatch(selectCard());
-        } else if (previousCard > -1) {
+        } else if (current > 0) {
           console.log("voltando")
-          setPreviousCard(previousCard - 1)
-          const cardDeckIndex = Array.from(displayedCards)[previousCard]
+          const cardDeckIndex = Array.from(displayedCards)[current - 1]
 
+          setCurrent(current - 1)
           if (deck?.cards) {
             dispatch(selectCard(deck.cards[cardDeckIndex]));
           }
