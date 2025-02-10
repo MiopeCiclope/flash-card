@@ -35,6 +35,7 @@ const getSwipeDirection = (
   }
   return SwipeDirection.None;
 };
+
 export default function CardDisplay() {
   const [isFront, setIsFront] = useState(true)
   const deck = useSelector((state: any) => state?.deckReducer.selectedDeck) as Deck | null;
@@ -48,13 +49,11 @@ export default function CardDisplay() {
 
   useEffect(() => {
     if (isFocused && hasCard && deck?.cards?.length && !selectedCard && displayedCards.size === 0) {
-      console.log("fudeu")
       const firstCardIndex = Math.floor(Math.random() * deck.cards.length);
-      dispatch(selectCard(deck.cards[firstCardIndex]));
-
       const initialSet = new Set<number>();
       initialSet.add(firstCardIndex);
 
+      dispatch(selectCard(deck.cards[firstCardIndex]));
       setDisplayedCards(initialSet);
       setCurrent(0)
     }
@@ -72,8 +71,6 @@ export default function CardDisplay() {
     const { translationX, translationY } = event.nativeEvent;
     const swipeDirection = getSwipeDirection(translationX, translationY);
     setIsFront(true)
-    console.log("display", displayedCards.size)
-    console.log("previous", current)
 
     switch (swipeDirection) {
       case SwipeDirection.SwipeLeft:
@@ -81,9 +78,6 @@ export default function CardDisplay() {
 
         // current is the last in displayedCards and there is no card left
         if (newCard === null && current === (displayedCards.size - 1)) {
-          // current = 0
-          // get a new random card
-          console.log("case 3: restart")
           const restartSet = new Set<number>()
           setDisplayedCards(restartSet);
 
@@ -93,10 +87,6 @@ export default function CardDisplay() {
 
           // there is more cards and it is the last one
         } else if (newCard !== null && current === (displayedCards.size - 1)) {
-          // current + 1
-          // get a new random card
-
-          console.log("case 1")
           setCurrent(current + 1)
           const newDisplayedCards = new Set(displayedCards);
           if (deck?.cards) {
@@ -107,9 +97,6 @@ export default function CardDisplay() {
 
           // current is not the last displayed
         } else {
-          // current + 1
-          // get next card from displyed
-          console.log("case 2")
           const next = current + 1
           setCurrent(next)
           const cardDeckIndex = Array.from(displayedCards)[next]
@@ -126,10 +113,9 @@ export default function CardDisplay() {
           setCurrent(-1)
           dispatch(selectCard());
         } else if (current > 0) {
-          console.log("voltando")
           const cardDeckIndex = Array.from(displayedCards)[current - 1]
-
           setCurrent(current - 1)
+
           if (deck?.cards) {
             dispatch(selectCard(deck.cards[cardDeckIndex]));
           }
