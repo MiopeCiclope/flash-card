@@ -2,7 +2,7 @@ import { FlatList, TextInput, StyleSheet, TouchableOpacity } from 'react-native'
 import { Text, View } from '@/components/Themed';
 import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addDeck, deleteCard, selectCard } from '@/store/deckAction';
+import { addDeck, deleteCard, selectCard, selectDeck } from '@/store/deckAction';
 import { Deck } from '@/models/decks';
 import { useRouter } from 'expo-router';
 import { Card } from '@/models/card';
@@ -41,8 +41,11 @@ export default function DeckDetail() {
 
   const handleSave = () => {
     if (selectedCard.front.word && selectedCard.back.translation && selectedCard.back.sound) {
+      const isNewDeck = !selectedDeck
+
       setCardList((prevState) => {
         const existingIndex = prevState.findIndex((c) => c.id === selectedCard.id);
+        let newCardList = []
         if (existingIndex !== -1) {
           const updatedList = [...prevState];
           updatedList[existingIndex] = selectedCard;
@@ -50,14 +53,32 @@ export default function DeckDetail() {
           if (selectedCard.id === displayingCard.id) {
             dispatch(selectCard(selectedCard));
           }
-
-          return updatedList;
+          newCardList = updatedList
         } else {
-          return [...prevState, { ...selectedCard, id: generateRandomId() }];
+          newCardList = [...prevState, { ...selectedCard, id: generateRandomId() }];
         }
+
+        const deckId = isNewDeck ? generateRandomId() : selectedDeck.id
+        const deckToSave = {
+          id: deckId,
+          name: name,
+          iconName: iconName,
+          cards: newCardList,
+        }
+
+        dispatch(
+          addDeck(deckList, deckToSave as Deck)
+        );
+
+        if (isNewDeck) {
+          dispatch(selectDeck(deckToSave))
+        }
+
+        return newCardList
       });
 
       setSelectedCard(emptyCard);
+
     }
   };
 

@@ -57,7 +57,13 @@ export default function CardDisplay() {
       setDisplayedCards(initialSet);
       setCurrent(0)
     }
-  }, [deck, selectedCard, dispatch]);
+
+    if (!isFocused) {
+      dispatch(selectCard())
+      setDisplayedCards(new Set())
+    }
+
+  }, [deck, selectedCard, dispatch, isFocused]);
 
   const getRandomCard = (): Card | null => {
     if (!hasCard) return null;

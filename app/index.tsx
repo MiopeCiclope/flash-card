@@ -13,7 +13,6 @@ export default function ListScreen() {
 
   useEffect(() => {
     if (isFocused) {
-      console.log("outro fudeu")
       dispatch(selectCard());
     }
   }, []);
