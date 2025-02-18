@@ -36,12 +36,16 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '60%',
+    justifyContent: 'space-between',
+    width: '100%',
     marginTop: 20,
   },
   buttonText: {
+    flex: 1,
     fontSize: 18,
+    borderRadius: 15,
+    borderColor: "gray",
+    borderBlockColor: "black"
   },
 });
 
