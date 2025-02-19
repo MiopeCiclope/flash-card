@@ -1,6 +1,6 @@
 import { FlatList, TextInput, StyleSheet, TouchableOpacity, GestureResponderEvent } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import {  useState } from 'react';
+import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addDeck, deleteCard, selectCard, selectDeck } from '@/store/deckAction';
 import { Deck } from '@/models/decks';
@@ -169,7 +169,7 @@ export default function DeckDetail() {
       <FlatList
         data={cardList}
         renderItem={({ item }: any) => (
-          <TouchableOpacity onPress={() => setDeleteCardId(item.id)} >
+          <TouchableOpacity onPress={() => dispatch(selectCard(item))} >
             <View style={styles.card}>
               <Text style={styles.cardText}>{item.front.word}</Text>
               <TouchableOpacity onPress={(event: GestureResponderEvent) => {
