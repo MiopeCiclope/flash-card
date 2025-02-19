@@ -1,6 +1,6 @@
-import { FlatList, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { FlatList, TextInput, StyleSheet, TouchableOpacity, GestureResponderEvent } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import { useState } from 'react';
+import {  useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addDeck, deleteCard, selectCard, selectDeck } from '@/store/deckAction';
 import { Deck } from '@/models/decks';
@@ -37,6 +37,7 @@ export default function DeckDetail() {
     setName,
     cardList,
     setCardList,
+    shouldNavigateBack
   } = useDeckState(selectedDeck, displayingCard, deckList)
 
   const handleSave = () => {
@@ -78,20 +79,12 @@ export default function DeckDetail() {
       });
 
       setSelectedCard(emptyCard);
-
     }
-  };
 
-  const handleSubmit = () => {
-    dispatch(
-      addDeck(deckList, {
-        id: !selectedDeck ? generateRandomId() : selectedDeck.id,
-        name: name,
-        iconName: iconName,
-        cards: cardList,
-      } as Deck)
-    );
-    router.back();
+    // This should only navigate back to card-display page
+    if (shouldNavigateBack) {
+      router.push("/card-display")
+    }
   };
 
   const removeCard = (deckList: Deck[], deck: Deck, cardId: string | null) => {
@@ -171,19 +164,22 @@ export default function DeckDetail() {
         placeholderTextColor="lightgray"
       />
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.buttonText}>Save</Text>
-      </TouchableOpacity>
+      <View style={styles.hr} />
 
       <FlatList
         data={cardList}
         renderItem={({ item }: any) => (
-          <View style={styles.card}>
-            <Text style={styles.cardText}>{item.front.word}</Text>
-            <TouchableOpacity onPress={() => setDeleteCardId(item.id)}>
-              <Ionicons name="trash" size={20} color="#d9534f" />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity onPress={() => setDeleteCardId(item.id)} >
+            <View style={styles.card}>
+              <Text style={styles.cardText}>{item.front.word}</Text>
+              <TouchableOpacity onPress={(event: GestureResponderEvent) => {
+                event.stopPropagation()
+                setDeleteCardId(item.id)
+              }}>
+                <Ionicons name="trash" size={20} color="#d9534f" />
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
         )}
       />
 
@@ -195,14 +191,19 @@ export default function DeckDetail() {
         onNo={() => setDeleteCardId(null)}
       />
 
-      <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-        <Text style={styles.buttonText}>Submit</Text>
+      <TouchableOpacity style={styles.submitButton} onPress={handleSave}>
+        <Text style={styles.buttonText}>Save</Text>
       </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  hr: {
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
+    marginVertical: 10,
+  },
   container: {
     flex: 1,
     padding: 16,

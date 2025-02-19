@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, GestureResponderEvent } from 'react-native';
 import { Deck as FlashDeck } from '@/models/decks';
 import { deleteDeck, selectCard, selectDeck } from '@/store/deckAction';
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,12 +21,14 @@ const Deck = ({ deck }: { deck: FlashDeck }) => {
   }
   const cleanCard = () => dispatch(selectCard());
 
-  const removeDeck = () => {
+  const removeDeck = (event: GestureResponderEvent) => {
+    event.stopPropagation()
     dispatch(deleteDeck(deckList, deck.id));
     setModalVisible(false);
   };
 
-  const editDeck = () => {
+  const editDeck = (event: GestureResponderEvent) => {
+    event.stopPropagation()
     cleanCard();
     openDeck();
     router.push('/deck-detail');

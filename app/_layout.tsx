@@ -12,6 +12,7 @@ import Providers from '@/components/Providers';
 import { useSelector } from 'react-redux';
 import { Deck } from '@/models/decks';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import RouteProvider from '@/contexts/RouterProvider';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -62,56 +63,58 @@ function RootLayoutNav() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Drawer>
-        <Drawer.Screen
-          name="index"
-          options={{
-            headerTitle: 'Deck List',
-            title: 'Deck List',
-            headerRight: () => <AddDeck />,
-          }}
-        />
-        <Drawer.Screen
-          name="card-display"
-          options={{
-            headerTitle: deckScreenTitle,
-            headerRight: () => <EditDeck />,
-            drawerItemStyle: { display: 'none' }
-          }}
-        />
-        <Drawer.Screen
-          name="deck-detail"
-          options={{
-            headerTitle: deckDetailTitle,
-            drawerItemStyle: { display: 'none' }
-          }}
-        />
-        <Drawer.Screen
-          name="modal"
-          options={{
-            drawerItemStyle: { display: 'none' }
-          }}
-        />
-        <Drawer.Screen
-          name="import-data"
-          options={{
-            headerTitle: "Restore",
-            title: "Restore",
-          }}
-        />
-        <Drawer.Screen
-          name="+not-found"
-          options={{
-            drawerItemStyle: { display: 'none' }
-          }}
-        />
-        <Drawer.Screen
-          name="export-data"
-          options={{
-            headerTitle: "Backup",
-            title: "Backup",
-          }} />
-      </Drawer>
+      <RouteProvider>
+        <Drawer>
+          <Drawer.Screen
+            name="index"
+            options={{
+              headerTitle: 'Deck List',
+              title: 'Deck List',
+              headerRight: () => <AddDeck />,
+            }}
+          />
+          <Drawer.Screen
+            name="card-display"
+            options={{
+              headerTitle: deckScreenTitle,
+              headerRight: () => <EditDeck />,
+              drawerItemStyle: { display: 'none' }
+            }}
+          />
+          <Drawer.Screen
+            name="deck-detail"
+            options={{
+              headerTitle: deckDetailTitle,
+              drawerItemStyle: { display: 'none' }
+            }}
+          />
+          <Drawer.Screen
+            name="modal"
+            options={{
+              drawerItemStyle: { display: 'none' }
+            }}
+          />
+          <Drawer.Screen
+            name="import-data"
+            options={{
+              headerTitle: "Restore",
+              title: "Restore",
+            }}
+          />
+          <Drawer.Screen
+            name="+not-found"
+            options={{
+              drawerItemStyle: { display: 'none' }
+            }}
+          />
+          <Drawer.Screen
+            name="export-data"
+            options={{
+              headerTitle: "Backup",
+              title: "Backup",
+            }} />
+        </Drawer>
+      </RouteProvider>
     </ThemeProvider>
   );
 }

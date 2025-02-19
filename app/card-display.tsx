@@ -59,7 +59,6 @@ export default function CardDisplay() {
     }
 
     if (!isFocused) {
-      dispatch(selectCard())
       setDisplayedCards(new Set())
     }
 

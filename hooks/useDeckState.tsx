@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Card } from '@/models/card';
 import { Deck } from '@/models/decks';
+import { RouteContext } from '@/contexts/RouterProvider';
 
 function useDeckState(selectedDeck: Deck | null, displayingCard: Card | null, deckList: Deck[]) {
   const emptyCard: Card = {
@@ -13,13 +14,17 @@ function useDeckState(selectedDeck: Deck | null, displayingCard: Card | null, de
   const [iconName, setIconName] = useState<string>(selectedDeck?.iconName || '');
   const [name, setName] = useState<string>(selectedDeck?.name || '');
   const [cardList, setCardList] = useState<Card[]>(selectedDeck?.cards || []);
+  const [shouldNavigateBack, setShouldNavigateBack] = useState(false)
+
+  const { previousRoute } = useContext(RouteContext);
 
   useEffect(() => {
     setSelectedCard(displayingCard || emptyCard);
     setIconName(selectedDeck?.iconName || '');
     setName(selectedDeck?.name || '');
     setCardList(selectedDeck?.cards || []);
-  }, [selectedDeck, displayingCard, deckList]);
+    setShouldNavigateBack(previousRoute === "/card-display")
+  }, [selectedDeck, displayingCard, deckList, previousRoute]);
 
   return {
     selectedCard,
@@ -30,6 +35,7 @@ function useDeckState(selectedDeck: Deck | null, displayingCard: Card | null, de
     setName,
     cardList,
     setCardList,
+    shouldNavigateBack
   };
 }
 
