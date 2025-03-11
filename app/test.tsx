@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Button, View, Text, Image, StyleSheet, Alert } from "react-native";
+import { Button, View, Text, Image, StyleSheet, Alert, ActivityIndicator } from "react-native";
 import * as WebBrowser from "expo-web-browser";
 import axios from "axios";
 import * as Linking from 'expo-linking';
 import { useSelector } from "react-redux";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CLIENT_ID = "Ov23liL4XDmLY2j5Om92";
 const REDIRECT_URI = "https://just-flash-card.netlify.app/test"; // Must match the callback URL in GitHub OAuth App
-const SCOPE = "public_repo"; // Requested permissions (public_repo for public repositories)
+const SCOPE = "user public_repo"; // Requested permissions (public_repo for public repositories)
 
 interface UserData {
   name: string;
@@ -19,14 +20,31 @@ interface UserData {
 export default function Test() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null); // Store the access token
+  const [loading, setLoading] = useState(true); // Loading state
   const state = useSelector((state) => state); // Access the entire Redux state
   const url = Linking.useURL();
+
+  // Load the token from AsyncStorage on app load
+  useEffect(() => {
+    const loadToken = async () => {
+      const token = await AsyncStorage.getItem("github_access_token");
+      if (token) {
+        setAccessToken(token);
+        const userData = await fetchUserData(token);
+        setUserData(userData);
+      }
+      setLoading(false); // Stop loading after token is loaded
+    };
+
+    loadToken();
+  }, []);
 
   const fetchUser = async (code: string) => {
     const accessToken = await exchangeCodeForToken(code);
 
     if (accessToken) {
       setAccessToken(accessToken); // Save the access token
+      await AsyncStorage.setItem("github_access_token", accessToken); // Store the token
       const userData = await fetchUserData(accessToken);
       setUserData(userData);
     }
@@ -134,10 +152,10 @@ export default function Test() {
   };
 
   const pushReduxStateToRepo = async () => {
-    //if (!accessToken || !userData) {
-    //  Alert.alert("Error", "You must be logged in to push Redux state.");
-    //  return;
-    //}
+    if (!accessToken || !userData) {
+      Alert.alert("Error", "You must be logged in to push Redux state.");
+      return;
+    }
 
     const jsonString = saveReduxStateToJson(); // Get the Redux state as JSON
     const fileName = "redux-state.json"; // Name of the file to create
@@ -232,6 +250,23 @@ export default function Test() {
     }
   };
 
+  const handleLogout = async () => {
+    // Clear the token and user data
+    await AsyncStorage.removeItem("github_access_token");
+    setAccessToken(null);
+    setUserData(null);
+    Alert.alert("Success", "You have been logged out.");
+  };
+
+  // Show a loading indicator while the token is being loaded
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {!userData && <Text style={styles.title}>Sign in with Github</Text>}
@@ -243,6 +278,7 @@ export default function Test() {
           <Text>{userData.bio}</Text>
           <Button title="Create Repository" onPress={createRepo} />
           <Button title="Save Redux State to Repo" onPress={pushReduxStateToRepo} />
+          <Button title="Log Out" onPress={handleLogout} />
         </View>
       ) : (
         <Button title="Login with GitHub" onPress={handleLogin} />
