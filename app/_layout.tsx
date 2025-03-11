@@ -113,6 +113,13 @@ function RootLayoutNav() {
               headerTitle: "Backup",
               title: "Backup",
             }} />
+          <Drawer.Screen
+            name="test"
+            options={{
+              drawerItemStyle: { display: 'none' }
+            }}
+          />
+
         </Drawer>
       </RouteProvider>
     </ThemeProvider>
