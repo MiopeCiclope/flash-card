@@ -5,10 +5,13 @@ import axios from "axios";
 import * as Linking from 'expo-linking';
 import { useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
-const CLIENT_ID = "Ov23liL4XDmLY2j5Om92";
-const REDIRECT_URI = "https://just-flash-card.netlify.app/test"; // Must match the callback URL in GitHub OAuth App
-const SCOPE = "user public_repo"; // Requested permissions (public_repo for public repositories)
+import {
+  CLIENT_ID,
+  CLIENT_SECRET,
+  REDIRECT_URI,
+  GITHUB_API_URL,
+  GITHUB_AUTH_URL,
+} from '@env';
 
 interface UserData {
   name: string;
@@ -62,7 +65,7 @@ export default function Test() {
   }, [url]);
 
   const handleLogin = async () => {
-    const authUrl = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}`;
+    const authUrl = `${GITHUB_AUTH_URL}/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=public_repo`;
 
     const result = await WebBrowser.openAuthSessionAsync(authUrl, REDIRECT_URI);
   };
@@ -71,7 +74,11 @@ export default function Test() {
     try {
       const response = await axios.post(
         "https://just-flash-card.netlify.app/.netlify/functions/github-auth", // Proxy service endpoint
-        { code }
+        {
+          code,
+          client_id: CLIENT_ID,
+          client_secret: CLIENT_SECRET,
+        }
       );
       return response.data.access_token;
     } catch (error) {
@@ -82,7 +89,7 @@ export default function Test() {
 
   const fetchUserData = async (accessToken: string) => {
     try {
-      const response = await axios.get("https://api.github.com/user", {
+      const response = await axios.get(`${GITHUB_API_URL}/user`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -104,7 +111,7 @@ export default function Test() {
     try {
       // Step 1: Create a new repository
       const repoResponse = await axios.post(
-        "https://api.github.com/user/repos",
+        `${GITHUB_API_URL}/user/repos`,
         {
           name: "new-repo", // Repository name
           description: "This is a new repository created from my app", // Repository description
@@ -126,7 +133,7 @@ export default function Test() {
       const readmeContent = "# Welcome to My New Repository\n\nThis repository was created programmatically.";
 
       const commitResponse = await axios.put(
-        `https://api.github.com/repos/${userData.login}/${repoName}/contents/README.md`,
+        `${GITHUB_API_URL}/repos/${userData.login}/${repoName}/contents/README.md`,
         {
           message: "Initial commit", // Commit message
           content: btoa(readmeContent), // Base64-encoded content
@@ -163,7 +170,7 @@ export default function Test() {
     try {
       // Step 1: Get the SHA of the latest commit
       const refResponse = await axios.get(
-        `https://api.github.com/repos/${userData.login}/new-repo/git/refs/heads/master`,
+        `${GITHUB_API_URL}/repos/${userData.login}/new-repo/git/refs/heads/master`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -176,7 +183,7 @@ export default function Test() {
 
       // Step 2: Get the SHA of the tree associated with the latest commit
       const commitResponse = await axios.get(
-        `https://api.github.com/repos/${userData.login}/new-repo/git/commits/${latestCommitSha}`,
+        `${GITHUB_API_URL}/repos/${userData.login}/new-repo/git/commits/${latestCommitSha}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -189,7 +196,7 @@ export default function Test() {
 
       // Step 3: Create a new tree with the JSON file
       const treeResponse = await axios.post(
-        `https://api.github.com/repos/${userData.login}/new-repo/git/trees`,
+        `${GITHUB_API_URL}/repos/${userData.login}/new-repo/git/trees`,
         {
           base_tree: baseTreeSha,
           tree: [
@@ -213,7 +220,7 @@ export default function Test() {
 
       // Step 4: Create a new commit
       const commitResponse2 = await axios.post(
-        `https://api.github.com/repos/${userData.login}/new-repo/git/commits`,
+        `${GITHUB_API_URL}/repos/${userData.login}/new-repo/git/commits`,
         {
           message: "Add Redux state as JSON", // Commit message
           tree: newTreeSha,
@@ -231,7 +238,7 @@ export default function Test() {
 
       // Step 5: Update the reference to point to the new commit
       await axios.patch(
-        `https://api.github.com/repos/${userData.login}/new-repo/git/refs/heads/master`,
+        `${GITHUB_API_URL}/repos/${userData.login}/new-repo/git/refs/heads/master`,
         {
           sha: newCommitSha,
         },

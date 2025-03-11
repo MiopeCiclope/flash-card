@@ -119,6 +119,12 @@ function RootLayoutNav() {
               drawerItemStyle: { display: 'none' }
             }}
           />
+          <Drawer.Screen
+            name="playground"
+            options={{
+              drawerItemStyle: { display: 'none' }
+            }}
+          />
 
         </Drawer>
       </RouteProvider>
