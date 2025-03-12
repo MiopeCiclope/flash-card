@@ -5,11 +5,9 @@ import * as Linking from 'expo-linking';
 import { useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-  CLIENT_ID,
-  CLIENT_SECRET,
   GITHUB_API_URL,
 } from '@env';
-import { login } from "@/utils/github";
+import { createRepo, fetchToken, fetchUserData, login } from "@/utils/github";
 
 interface UserData {
   name: string;
@@ -41,7 +39,7 @@ export default function Test() {
   }, []);
 
   const fetchUser = async (code: string) => {
-    const accessToken = await exchangeCodeForToken(code);
+    const accessToken = await fetchToken(code);
 
     if (accessToken) {
       setAccessToken(accessToken); // Save the access token
@@ -61,89 +59,6 @@ export default function Test() {
       }
     }
   }, [url]);
-
-  const exchangeCodeForToken = async (code: string) => {
-    try {
-      const response = await axios.post(
-        "https://just-flash-card.netlify.app/.netlify/functions/github-auth", // Proxy service endpoint
-        {
-          code,
-          client_id: CLIENT_ID,
-          client_secret: CLIENT_SECRET,
-        }
-      );
-      return response.data.access_token;
-    } catch (error) {
-      console.error("Error exchanging code for token:", error);
-      return null;
-    }
-  };
-
-  const fetchUserData = async (accessToken: string) => {
-    try {
-      const response = await axios.get(`${GITHUB_API_URL}/user`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      return response.data as UserData;
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      return null;
-    }
-  };
-
-  const createRepo = async () => {
-    if (!accessToken || !userData) {
-      Alert.alert("Error", "You must be logged in to create a repository.");
-      return;
-    }
-
-    try {
-      // Step 1: Create a new repository
-      const repoResponse = await axios.post(
-        `${GITHUB_API_URL}/user/repos`,
-        {
-          name: "new-repo", // Repository name
-          description: "This is a new repository created from my app", // Repository description
-          private: false, // Set to true for a private repository
-          auto_init: true, // Initialize the repository with a README
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/vnd.github.v3+json",
-          },
-        }
-      );
-
-      const repoName = repoResponse.data.name;
-      Alert.alert("Success", "Repository created successfully!");
-
-      // Step 2: Add an initial commit
-      const readmeContent = "# Welcome to My New Repository\n\nThis repository was created programmatically.";
-
-      const commitResponse = await axios.put(
-        `${GITHUB_API_URL}/repos/${userData.login}/${repoName}/contents/README.md`,
-        {
-          message: "Initial commit", // Commit message
-          content: btoa(readmeContent), // Base64-encoded content
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/vnd.github.v3+json",
-          },
-        }
-      );
-
-      Alert.alert("Success", "Initial commit added to repository!");
-    } catch (error) {
-      console.error("Error creating repository or adding commit:", error);
-      Alert.alert("Error", "Failed to create repository or add commit.");
-    }
-  };
 
   const saveReduxStateToJson = () => {
     const jsonString = JSON.stringify(state, null, 2); // Convert to JSON string
@@ -275,7 +190,7 @@ export default function Test() {
           <Text style={styles.welcomeText}>Welcome, {userData.name}!</Text>
           <Image source={{ uri: userData.avatar_url }} style={styles.avatar} />
           <Text>{userData.bio}</Text>
-          <Button title="Create Repository" onPress={createRepo} />
+          <Button title="Create Repository" onPress={() => createRepo(accessToken, userData)} />
           <Button title="Save Redux State to Repo" onPress={pushReduxStateToRepo} />
           <Button title="Log Out" onPress={handleLogout} />
         </View>

@@ -15,6 +15,7 @@ import { UserData } from '@/models/git-user';
 const REDIRECT_URI = `${BASE_URL}${CALLBACK_GIT_URI}`
 const TOKEN_URI = `${BASE_URL}${LAMBDA}${GITHUB_TOKEN}`
 const SCOPE = "public_repo"
+const REPOSITORY_NAME = "FlashCardStorage"
 
 const login = async () => {
   const authUrl = `${GITHUB_AUTH_URL}/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}`;
@@ -57,13 +58,13 @@ const successMessage = "Success"
 const errorMessage = "Error"
 const notLoggedInError = "You must be logged in to create a repository."
 
-const createCommit = async (accessToken: string, userData: UserData, repoName: string, commitMessage: string, content: string) => {
+const createCommit = async (accessToken: string, userData: UserData, commitMessage: string, content: string) => {
   const commitSuccess = "Commit added to repository!"
   const commitCreationError = `${errorMessage} - Creating commit:`
 
   try {
     await axios.put(
-      `${GITHUB_API_URL}/repos/${userData.login}/${repoName}/contents/README.md`,
+      `${GITHUB_API_URL}/repos/${userData.login}/${REPOSITORY_NAME}/contents/README.md`,
       {
         message: commitMessage,
         content: btoa(content),
@@ -79,26 +80,25 @@ const createCommit = async (accessToken: string, userData: UserData, repoName: s
     console.log(successMessage, commitSuccess);
   } catch (error) {
     console.error(commitCreationError, error);
+    return
   }
 }
 
-const createRepo = async (accessToken: string, userData: UserData) => {
+const createRepo = async (accessToken: string | null, userData: UserData | null) => {
   if (!accessToken || !userData) {
     console.log(errorMessage, notLoggedInError)
     return;
   }
 
-  const repositoryName = "FlashCardStorage"
   const repositoryDescription = "This was created by JustFlashCard to backup your shit! I'M NOT RESPONSIBLE IF YOU FUCK THIS UP"
   const repositoryCreated = "Repository created successfully!"
-  const readmeContent = "# Welcome to My New Repository\n\nThis repository was created programmatically.";
   const repositoryCreationError = `${errorMessage} - Creating repository:`
 
   try {
     const repoResponse = await axios.post(
       `${GITHUB_API_URL}/user/repos`,
       {
-        name: repositoryName,
+        name: REPOSITORY_NAME,
         description: repositoryDescription,
         private: false,
         auto_init: true,
@@ -112,11 +112,11 @@ const createRepo = async (accessToken: string, userData: UserData) => {
     );
 
     const repoName = repoResponse.data.name;
-    await createCommit(accessToken, userData, repoName, "initial commit", readmeContent)
     console.log(successMessage, repositoryCreated);
     return repoName
   } catch (error) {
     console.error(repositoryCreationError, error);
+    return
   }
 };
 
