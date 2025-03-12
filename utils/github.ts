@@ -14,9 +14,10 @@ import { UserData } from '@/models/git-user';
 
 const REDIRECT_URI = `${BASE_URL}${CALLBACK_GIT_URI}`
 const TOKEN_URI = `${BASE_URL}${LAMBDA}${GITHUB_TOKEN}`
+const SCOPE = "public_repo"
 
 const login = async () => {
-  const authUrl = `${GITHUB_AUTH_URL}/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=public_repo`;
+  const authUrl = `${GITHUB_AUTH_URL}/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}`;
 
   await WebBrowser.openAuthSessionAsync(authUrl, REDIRECT_URI);
 }

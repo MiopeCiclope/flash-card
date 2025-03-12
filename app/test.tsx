@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Button, View, Text, Image, StyleSheet, Alert, ActivityIndicator } from "react-native";
-import * as WebBrowser from "expo-web-browser";
 import axios from "axios";
 import * as Linking from 'expo-linking';
 import { useSelector } from "react-redux";
@@ -8,10 +7,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   CLIENT_ID,
   CLIENT_SECRET,
-  REDIRECT_URI,
   GITHUB_API_URL,
-  GITHUB_AUTH_URL,
 } from '@env';
+import { login } from "@/utils/github";
 
 interface UserData {
   name: string;
@@ -63,12 +61,6 @@ export default function Test() {
       }
     }
   }, [url]);
-
-  const handleLogin = async () => {
-    const authUrl = `${GITHUB_AUTH_URL}/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=public_repo`;
-
-    const result = await WebBrowser.openAuthSessionAsync(authUrl, REDIRECT_URI);
-  };
 
   const exchangeCodeForToken = async (code: string) => {
     try {
@@ -288,7 +280,7 @@ export default function Test() {
           <Button title="Log Out" onPress={handleLogout} />
         </View>
       ) : (
-        <Button title="Login with GitHub" onPress={handleLogin} />
+        <Button title="Login with GitHub" onPress={login} />
       )}
     </View>
   );
