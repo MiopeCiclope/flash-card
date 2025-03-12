@@ -8,9 +8,9 @@ import { UserData } from "@/models/git-user";
 
 export default function Test() {
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null); // Store the access token
-  const [loading, setLoading] = useState(true); // Loading state
-  const state = useSelector((state) => state); // Access the entire Redux state
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const state = useSelector((state) => state);
   const url = Linking.useURL();
 
   // Load the token from AsyncStorage on app load

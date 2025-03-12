@@ -2,7 +2,6 @@ import {
   CLIENT_ID,
   CLIENT_SECRET,
   BASE_URL,
-  CALLBACK_GIT_URI,
   GITHUB_API_URL,
   GITHUB_AUTH_URL,
   LAMBDA,
@@ -12,7 +11,7 @@ import * as WebBrowser from "expo-web-browser";
 import axios from "axios";
 import { UserData } from '@/models/git-user';
 
-const REDIRECT_URI = `${BASE_URL}${CALLBACK_GIT_URI}`
+const REDIRECT_URI = `${BASE_URL}`
 const TOKEN_URI = `${BASE_URL}${LAMBDA}${GITHUB_TOKEN}`
 const SCOPE = "public_repo"
 const REPOSITORY_NAME = "FlashCardStorage"
