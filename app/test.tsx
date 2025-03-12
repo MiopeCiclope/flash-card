@@ -1,20 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Button, View, Text, Image, StyleSheet, Alert, ActivityIndicator } from "react-native";
-import axios from "axios";
 import * as Linking from 'expo-linking';
 import { useSelector } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {
-  GITHUB_API_URL,
-} from '@env';
-import { createRepo, fetchToken, fetchUserData, login } from "@/utils/github";
-
-interface UserData {
-  name: string;
-  avatar_url: string;
-  bio: string;
-  login: string; // GitHub username
-}
+import { commitNpush, createRepo, fetchToken, fetchUserData, login } from "@/utils/github";
+import { UserData } from "@/models/git-user";
 
 export default function Test() {
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -71,97 +61,10 @@ export default function Test() {
       return;
     }
 
-    const jsonString = saveReduxStateToJson(); // Get the Redux state as JSON
-    const fileName = "redux-state.json"; // Name of the file to create
-
-    try {
-      // Step 1: Get the SHA of the latest commit
-      const refResponse = await axios.get(
-        `${GITHUB_API_URL}/repos/${userData.login}/new-repo/git/refs/heads/master`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/vnd.github.v3+json",
-          },
-        }
-      );
-
-      const latestCommitSha = refResponse.data.object.sha;
-
-      // Step 2: Get the SHA of the tree associated with the latest commit
-      const commitResponse = await axios.get(
-        `${GITHUB_API_URL}/repos/${userData.login}/new-repo/git/commits/${latestCommitSha}`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/vnd.github.v3+json",
-          },
-        }
-      );
-
-      const baseTreeSha = commitResponse.data.tree.sha;
-
-      // Step 3: Create a new tree with the JSON file
-      const treeResponse = await axios.post(
-        `${GITHUB_API_URL}/repos/${userData.login}/new-repo/git/trees`,
-        {
-          base_tree: baseTreeSha,
-          tree: [
-            {
-              path: fileName,
-              mode: "100644", // File mode (100644 = regular file)
-              type: "blob",
-              content: jsonString, // Use the plain JSON string
-            },
-          ],
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/vnd.github.v3+json",
-          },
-        }
-      );
-
-      const newTreeSha = treeResponse.data.sha;
-
-      // Step 4: Create a new commit
-      const commitResponse2 = await axios.post(
-        `${GITHUB_API_URL}/repos/${userData.login}/new-repo/git/commits`,
-        {
-          message: "Add Redux state as JSON", // Commit message
-          tree: newTreeSha,
-          parents: [latestCommitSha],
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/vnd.github.v3+json",
-          },
-        }
-      );
-
-      const newCommitSha = commitResponse2.data.sha;
-
-      // Step 5: Update the reference to point to the new commit
-      await axios.patch(
-        `${GITHUB_API_URL}/repos/${userData.login}/new-repo/git/refs/heads/master`,
-        {
-          sha: newCommitSha,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/vnd.github.v3+json",
-          },
-        }
-      );
-
-      Alert.alert("Success", "Redux state pushed to repository!");
-    } catch (error) {
-      console.error("Error pushing Redux state:", error);
-      Alert.alert("Error", "Failed to push Redux state to repository.");
-    }
+    const content = saveReduxStateToJson();
+    const fileName = "flash-card-dump.json";
+    const commitMessage = `Back Up ${new Date().toUTCString()}`
+    await commitNpush(accessToken, userData, content, fileName, commitMessage)
   };
 
   const handleLogout = async () => {

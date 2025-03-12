@@ -16,6 +16,7 @@ const REDIRECT_URI = `${BASE_URL}${CALLBACK_GIT_URI}`
 const TOKEN_URI = `${BASE_URL}${LAMBDA}${GITHUB_TOKEN}`
 const SCOPE = "public_repo"
 const REPOSITORY_NAME = "FlashCardStorage"
+const BRANCH_NAME = "master"
 
 const login = async () => {
   const authUrl = `${GITHUB_AUTH_URL}/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}`;
@@ -58,16 +59,69 @@ const successMessage = "Success"
 const errorMessage = "Error"
 const notLoggedInError = "You must be logged in to create a repository."
 
-const createCommit = async (accessToken: string, userData: UserData, commitMessage: string, content: string) => {
-  const commitSuccess = "Commit added to repository!"
-  const commitCreationError = `${errorMessage} - Creating commit:`
+const getLastestCommitSha = async (accessToken: string, userData: UserData) => {
+  const latestCommitSuccess = "Fetching Latest Commit SHA"
+  const latestCommitFetchError = `${errorMessage} - ${latestCommitSuccess}`
 
   try {
-    await axios.put(
-      `${GITHUB_API_URL}/repos/${userData.login}/${REPOSITORY_NAME}/contents/README.md`,
+    const refResponse = await axios.get(
+      `${GITHUB_API_URL}/repos/${userData.login}/${REPOSITORY_NAME}/git/refs/heads/${BRANCH_NAME}`,
       {
-        message: commitMessage,
-        content: btoa(content),
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      }
+    );
+
+    console.log(successMessage, latestCommitSuccess)
+    return refResponse.data.object.sha;
+  } catch (error) {
+    console.error(latestCommitFetchError, error)
+    return
+  }
+}
+
+const getTreeSha = async (accessToken: string, userData: UserData, latestCommitSha: string) => {
+  const treeShaSuccess = "Fetching Tree SHA"
+  const treeShaFetchError = `${errorMessage} - ${treeShaSuccess}`
+
+  try {
+    const treeShaResponse = await axios.get(
+      `${GITHUB_API_URL}/repos/${userData.login}/${REPOSITORY_NAME}/git/commits/${latestCommitSha}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      }
+    );
+
+    console.log(successMessage, treeShaSuccess)
+    return treeShaResponse.data.tree.sha;
+  } catch (error) {
+    console.error(treeShaFetchError, error)
+    return
+  }
+}
+
+const createNewTree = async (accessToken: string, userData: UserData, baseTreeSha: string, fileName: string, content: string) => {
+  const treeCreationSuccess = "Tree Creation"
+  const treeCreationError = `${errorMessage} - ${treeCreationSuccess}`
+
+  try {
+    const treeResponse = await axios.post(
+      `${GITHUB_API_URL}/repos/${userData.login}/${REPOSITORY_NAME}/git/trees`,
+      {
+        base_tree: baseTreeSha,
+        tree: [
+          {
+            path: fileName,
+            mode: "100644",
+            type: "blob",
+            content
+          },
+        ],
       },
       {
         headers: {
@@ -77,11 +131,65 @@ const createCommit = async (accessToken: string, userData: UserData, commitMessa
       }
     );
 
+    console.log(successMessage, treeCreationSuccess)
+    return treeResponse.data.sha;
+  } catch (error) {
+    console.error(treeCreationError, error)
+    return
+  }
+}
+
+const createCommit = async (accessToken: string, userData: UserData, commitMessage: string, treeSha: string, parents: string[]) => {
+  const commitSuccess = "Commit added to repository!"
+  const commitCreationError = `${errorMessage} - Creating commit:`
+
+  try {
+    const commitResponse = await axios.post(
+      `${GITHUB_API_URL}/repos/${userData.login}/${REPOSITORY_NAME}/git/commits`,
+      {
+        message: commitMessage,
+        tree: treeSha,
+        parents
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      });
+
     console.log(successMessage, commitSuccess);
+    return commitResponse.data.sha
   } catch (error) {
     console.error(commitCreationError, error);
     return
   }
+}
+
+const pushBranch = async (accessToken: string, userData: UserData, commitSha: string) => {
+  const pushSuccess = "Push branch"
+  const pushError = `${errorMessage} - ${pushSuccess}:`
+
+  try {
+    await axios.patch(
+      `${GITHUB_API_URL}/repos/${userData.login}/${REPOSITORY_NAME}/git/refs/heads/master`,
+      {
+        sha: commitSha,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/vnd.github.v3+json",
+        },
+      }
+    );
+
+    console.log(successMessage, pushSuccess);
+  } catch (error) {
+    console.error(pushError, error);
+  }
+
+  return
 }
 
 const createRepo = async (accessToken: string | null, userData: UserData | null) => {
@@ -120,4 +228,17 @@ const createRepo = async (accessToken: string | null, userData: UserData | null)
   }
 };
 
-export { login, fetchToken, fetchUserData, createRepo }
+const commitNpush = async (accessToken: string | null, userData: UserData | null, content: string, fileName: string, commitMessage: string) => {
+  if (!accessToken || !userData) {
+    console.log(errorMessage, notLoggedInError)
+    return;
+  }
+
+  const latestCommitSha = await getLastestCommitSha(accessToken, userData)
+  const treeSha = await getTreeSha(accessToken, userData, latestCommitSha)
+  const newTreeSha = await createNewTree(accessToken, userData, treeSha, fileName, content)
+  const newCommitSha = await createCommit(accessToken, userData, commitMessage, newTreeSha, [latestCommitSha])
+  await pushBranch(accessToken, userData, newCommitSha)
+}
+
+export { login, fetchToken, fetchUserData, createRepo, commitNpush }
