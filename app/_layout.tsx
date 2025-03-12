@@ -17,10 +17,10 @@ import CustomDrawerContent from '@/components/custom-drawer';
 import { UserProvider } from '@/contexts/UserContext';
 import * as Linking from 'expo-linking';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { fetchToken, fetchUserData, login } from '@/utils/github';
+import { commitNpush, fetchToken, fetchUserData, login } from '@/utils/github';
 import { UserData } from '@/models/git-user';
 import { View } from '@/components/Themed';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, Alert } from 'react-native';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -65,6 +65,7 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
+  const state = useSelector((state) => state);
   const selectedDeck = useSelector((state: any) => state?.deckReducer.selectedDeck) as Deck | null;
   const deckScreenTitle = !selectedDeck ? "Deck" : selectedDeck.name;
   const deckDetailTitle = !selectedDeck ? "New Deck" : selectedDeck.name;
@@ -127,6 +128,23 @@ function RootLayoutNav() {
     );
   }
 
+  const saveReduxStateToJson = () => {
+    const jsonString = JSON.stringify(state, null, 2); // Convert to JSON string
+    return jsonString;
+  };
+
+  const pushReduxStateToRepo = async () => {
+    if (!accessToken || !userData) {
+      Alert.alert("Error", "You must be logged in to push Redux state.");
+      return;
+    }
+
+    const content = saveReduxStateToJson();
+    const fileName = "flash-card-dump.json";
+    const commitMessage = `Back Up ${new Date().toUTCString()}`
+    await commitNpush(accessToken, userData, content, fileName, commitMessage)
+  };
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <UserProvider>
@@ -135,6 +153,7 @@ function RootLayoutNav() {
             userData={userData}
             onLogin={() => login()}
             onLogout={handleLogout}
+            onSync={() => pushReduxStateToRepo()}
           />}>
             <Drawer.Screen
               name="index"

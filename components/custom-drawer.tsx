@@ -1,18 +1,21 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { DrawerItemList, DrawerContentComponentProps } from '@react-navigation/drawer';
+import { MaterialIcons } from '@expo/vector-icons'; // Import the icon library
 import { UserData } from '@/models/git-user';
 
 type CustomDrawerContentProps = DrawerContentComponentProps & {
   userData: UserData | null;
   onLogin: () => void;
   onLogout: () => void;
+  onSync: () => void; // Add a prop for the sync function
 };
 
 export default function CustomDrawerContent({
   userData,
   onLogin,
   onLogout,
+  onSync,
   ...props
 }: CustomDrawerContentProps) {
   return (
@@ -22,6 +25,12 @@ export default function CustomDrawerContent({
         <View style={styles.userContainer}>
           <Image source={{ uri: userData.avatar_url }} style={styles.avatar} />
           <Text style={styles.userName}>{userData.name}</Text>
+
+          {/* Sync Data Button */}
+          <TouchableOpacity onPress={onSync} style={styles.syncButton}>
+            <MaterialIcons name="sync" size={24} color="#fff" />
+            <Text style={styles.syncButtonText}>Sync Data</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <TouchableOpacity onPress={onLogin} style={styles.loginButton}>
@@ -65,6 +74,19 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  syncButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#007AFF',
+    padding: 10,
+    borderRadius: 5,
+  },
+  syncButtonText: {
+    color: '#fff',
+    marginLeft: 10,
     fontWeight: 'bold',
   },
   loginButton: {
